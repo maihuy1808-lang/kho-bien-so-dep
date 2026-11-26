@@ -25,10 +25,12 @@
   </div>
   <nav><div class="w">
     <a href="#kho" onclick="quick({})">Tất cả biển</a>
-    <a href="#kho" onclick="quick({t:'Ngũ quý'})">Ngũ quý</a>
-    <a href="#kho" onclick="quick({t:'Thần tài'})">Thần tài</a>
-    <a href="#kho" onclick="quick({t:'Phát lộc'})">Phát lộc</a>
-    <a href="#kho" onclick="quick({v:'xemay'})">Biển xe máy</a>
+    <a href="#kho" data-t="Ngũ quý" onclick="quick({t:'Ngũ quý'})">Ngũ quý</a>
+    <a href="#kho" data-t="Tứ quý" onclick="quick({t:'Tứ quý'})">Tứ quý</a>
+    <a href="#kho" data-t="Thần tài" onclick="quick({t:'Thần tài'})">Thần tài</a>
+    <a href="#kho" data-t="Phát lộc" onclick="quick({t:'Phát lộc'})">Phát lộc</a>
+    <a href="#kho" data-t="Tam hoa" onclick="quick({t:'Tam hoa'})">Tam hoa</a>
+    <a href="#kho" data-v="xemay" onclick="quick({v:'xemay'})">Biển xe máy</a>
     <a href="#kho" onclick="quick({p:'35'})">Biển Ninh Bình</a>
     <a href="#phongthuy">Xem phong thủy</a>
     <a href="#trung" onclick="quick({})">Biển trúng đấu giá</a>
@@ -147,7 +149,7 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="data.js"></script>
+<script>document.write('<script src="data.js?v=' + Math.floor(Date.now() / 60000) + '"><\/script>');</script>
 <script src="app.js"></script>
 </body>
 </html>

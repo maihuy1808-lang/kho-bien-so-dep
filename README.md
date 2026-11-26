@@ -6,7 +6,8 @@ Hotline/Zalo: 0326.583.583 · TikTok [@mrxuanhuy](https://www.tiktok.com/@mrxuan
 
 ## Sửa nội dung
 
-- Danh sách biển, số điện thoại, link mạng xã hội: sửa trong `data.js`.
+- **Cách dễ nhất:** vào https://maixuanhuy.id.vn/admin/, đăng nhập bằng mã truy cập GitHub (Fine-grained token, chỉ cấp quyền *Contents: Read and write* cho kho này), sửa rồi bấm **Lưu lên website**. Web cập nhật sau 1–2 phút.
+- Danh sách biển, số điện thoại, link mạng xã hội nằm trong `data.js` (trang admin tự ghi file này).
 - Giao diện: `style.css`. Logic trang: `app.js`.
 
 Website thương mại tư nhân, không phải cơ quan nhà nước. Thông tin phong thủy mang tính tham khảo.

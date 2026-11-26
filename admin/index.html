@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Quản trị – Kho Biển Số Đẹp</title>
+<style>
+:root{--bg:#f6f4ef;--card:#fff;--ink:#1b2130;--mut:#667085;--line:#e3dfd3;--red:#b3141c;--red2:#8f0f16;--gold:#b8860b;--navy:#12233f;--ok:#157347;--okbg:#e7f4ec;--errbg:#fdecec;--warnbg:#fff6e0}
+@media (prefers-color-scheme:dark){:root{--bg:#0d1422;--card:#161f33;--ink:#eef0f5;--mut:#a4aec0;--line:#29344f;--red:#e8424a;--red2:#c1272d;--gold:#e0b64a;--navy:#08101e;--ok:#3fbf7f;--okbg:#12301f;--errbg:#3a1518;--warnbg:#3a2e10;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--red)}
+.w{max-width:1100px;margin:0 auto;padding:0 16px}
+header{background:var(--navy);color:#fff}
+header .w{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:12px;flex-wrap:wrap}
+header b{font-size:17px}header small{opacity:.8;display:block;font-size:12px}
+header a{color:#fff}
+.btn{background:var(--red);color:#fff;border:0;border-radius:9px;padding:10px 16px;font-weight:700;cursor:pointer;font:inherit;font-weight:700}
+.btn:hover{background:var(--red2)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+header .btn.ghost{color:#fff;border-color:rgba(255,255,255,.4)}
+.btn.sm{padding:6px 10px;font-size:13px}
+.btn.ok{background:var(--ok)}
+input,select,textarea{padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit;width:100%}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--red);outline-offset:-1px}
+label{font-size:13px;color:var(--mut);display:block;margin-bottom:4px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin:18px 0}
+.card h2{margin:0 0 12px;font-size:18px}
+.login{max-width:520px;margin:40px auto}
+.steps{padding-left:20px;margin:8px 0 14px;font-size:14px}
+.steps li{margin-bottom:6px}
+.msg{padding:10px 14px;border-radius:9px;margin:12px 0;font-size:14px;display:none}
+.msg.on{display:block}.msg.ok{background:var(--okbg)}.msg.err{background:var(--errbg)}.msg.warn{background:var(--warnbg)}
+.tabs{display:flex;gap:6px;margin-top:18px;flex-wrap:wrap}
+.tab{background:var(--card);border:1px solid var(--line);border-radius:9px 9px 0 0;padding:9px 16px;cursor:pointer;font-weight:700;color:var(--ink);font:inherit;font-weight:700}
+.tab.on{background:var(--red);color:#fff;border-color:var(--red)}
+.pane{display:none}.pane.on{display:block}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.bar input{max-width:260px}.bar select{max-width:180px}
+.count{color:var(--mut);font-size:13px;margin-left:auto}
+.tbl{width:100%;border-collapse:collapse;font-size:14px}
+.tbl th{text-align:left;color:var(--mut);font-weight:600;font-size:12.5px;padding:6px;border-bottom:1px solid var(--line)}
+.tbl td{padding:5px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
+.tbl input,.tbl select{padding:7px 8px}
+.tbl .pre{width:90px}.tbl .tail{width:110px}.tbl .price{width:150px}
+.tbl select.vt{min-width:100px}.tbl select.stt{min-width:200px}
+.tbl{min-width:860px}
+.tbl tr.chg td{background:var(--warnbg)}
+.tbl tr.bad input.tail,.tbl tr.bad input.pre{border-color:var(--red)}
+.scroll{overflow-x:auto}
+.pv{font:800 13px "Arial Black",Arial,sans-serif;border:2px solid #111;border-radius:5px;padding:2px 6px;background:#fdfdfb;color:#111;white-space:nowrap}
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.save{position:sticky;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:12px 0;margin-top:20px;z-index:5}
+.save .w{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.save span{font-size:14px;color:var(--mut)}
+.post{border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px;display:grid;gap:8px}
+.hide{display:none!important}
+@media(max-width:640px){.tbl .price{width:110px}.bar input,.bar select{max-width:none}}
+</style>
+</head>
+<body>
+<header><div class="w">
+  <div><b>Quản trị Kho Biển Số Đẹp</b><small>maixuanhuy.id.vn</small></div>
+  <div style="display:flex;gap:8px">
+    <a class="btn ghost sm" href="../" target="_blank" rel="noopener">Xem website ↗</a>
+    <button class="btn ghost sm hide" id="logoutBtn" onclick="logout()">Đăng xuất</button>
+  </div>
+</div></header>
+
+<main class="w">
+
+<!-- ĐĂNG NHẬP -->
+<section class="card login" id="loginBox">
+  <h2>Đăng nhập quản trị</h2>
+  <p style="margin-top:0;color:var(--mut);font-size:14px">Đăng nhập bằng <b>mã truy cập GitHub</b> của tài khoản <b>maihuy1808-lang</b>. Mã chỉ lưu trên máy anh, không gửi đi đâu ngoài GitHub.</p>
+  <label for="tokIn">Mã truy cập GitHub</label>
+  <input id="tokIn" type="password" placeholder="github_pat_…" autocomplete="off">
+  <label style="margin-top:10px;display:flex;gap:8px;align-items:center;color:var(--ink)"><input type="checkbox" id="remember" checked style="width:auto"> Ghi nhớ trên máy này</label>
+  <div class="msg" id="loginMsg"></div>
+  <button class="btn" style="margin-top:12px;width:100%" id="loginBtn" onclick="login()">Đăng nhập</button>
+  <details style="margin-top:16px"><summary style="cursor:pointer;font-weight:700">Cách tạo mã truy cập (làm 1 lần)</summary>
+    <ol class="steps">
+      <li>Mở <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">GitHub → Tạo Fine-grained token</a> (đăng nhập tài khoản maihuy1808-lang).</li>
+      <li><b>Token name:</b> Admin web bien so. <b>Expiration:</b> chọn 90 ngày hoặc 1 năm.</li>
+      <li><b>Repository access:</b> chọn <i>Only select repositories</i> → <b>kho-bien-so-dep</b>.</li>
+      <li><b>Permissions → Repository permissions → Contents:</b> chọn <b>Read and write</b>.</li>
+      <li>Bấm <b>Generate token</b>, sao chép mã (bắt đầu bằng <code>github_pat_</code>) và dán vào ô trên.</li>
+    </ol>
+    <p style="font-size:13px;color:var(--mut)">Mã này chỉ sửa được kho website, không đụng tới gì khác trong tài khoản. Lộ mã thì vào GitHub xóa token là xong.</p>
+  </details>
+</section>
+
+<!-- BẢNG QUẢN TRỊ -->
+<section id="app" class="hide">
+  <div class="msg" id="appMsg"></div>
+  <div class="tabs">
+    <button class="tab on" data-t="plates" onclick="tab('plates')">Biển số</button>
+    <button class="tab" data-t="add" onclick="tab('add')">Thêm nhiều biển</button>
+    <button class="tab" data-t="info" onclick="tab('info')">Thông tin liên hệ</button>
+    <button class="tab" data-t="posts" onclick="tab('posts')">Bài viết</button>
+  </div>
+
+  <div class="card pane on" id="p-plates" style="margin-top:0;border-top-left-radius:0">
+    <div class="bar">
+      <input id="fq" placeholder="Tìm biển, ví dụ 999 hoặc 35A" oninput="drawPlates()" aria-label="Tìm biển">
+      <select id="fs" onchange="drawPlates()" aria-label="Lọc trạng thái"><option value="">Tất cả trạng thái</option><option value="con">Còn biển</option><option value="trung">Trúng đấu giá (đang bán)</option><option value="coc">Đã cọc</option><option value="ban">Đã bán</option></select>
+      <button class="btn sm" onclick="addRow()">+ Thêm 1 biển</button>
+      <span class="count" id="cnt"></span>
+    </div>
+    <div class="scroll"><table class="tbl">
+      <thead><tr><th>Xem trước</th><th>Đầu biển</th><th>Đuôi số</th><th>Loại xe</th><th>Giá (đồng, 0 = Liên hệ)</th><th>Trạng thái</th><th></th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table></div>
+  </div>
+
+  <div class="card pane" id="p-add" style="margin-top:0">
+    <h2>Thêm nhiều biển cùng lúc</h2>
+    <p style="margin-top:0;color:var(--mut);font-size:14px">Mỗi dòng một biển, ví dụ <code>35A-999.99</code> hoặc <code>35A-888.88 150000000</code> (kèm giá). Biển xe máy: <code>35B1-888.88</code>.</p>
+    <textarea id="bulk" rows="8" placeholder="35A-686.86&#10;35A-779.79 250000000"></textarea>
+    <div class="g2" style="margin-top:10px">
+      <div><label for="bulkSt">Trạng thái cho các biển này</label><select id="bulkSt"><option value="con">Còn biển</option><option value="trung">Trúng đấu giá (đang bán)</option></select></div>
+    </div>
+    <button class="btn" style="margin-top:12px" onclick="bulkAdd()">Thêm vào danh sách</button>
+    <div class="msg" id="bulkMsg"></div>
+  </div>
+
+  <div class="card pane" id="p-info" style="margin-top:0">
+    <h2>Thông tin liên hệ</h2>
+    <div class="g2" id="infoForm"></div>
+  </div>
+
+  <div class="card pane" id="p-posts" style="margin-top:0">
+    <h2>Bài viết (Tin tức &amp; kinh nghiệm)</h2>
+    <div id="postList"></div>
+    <button class="btn sm" onclick="addPost()">+ Thêm bài viết</button>
+  </div>
+</section>
+</main>
+
+<div class="save hide" id="saveBar"><div class="w">
+  <button class="btn ok" id="saveBtn" onclick="save()">Lưu lên website</button>
+  <button class="btn ghost" onclick="reload()">Hủy thay đổi</button>
+  <span id="saveInfo">Chưa có thay đổi.</span>
+</div></div>
+
+<script>
+(function () {
+  "use strict";
+  var OWNER = "maihuy1808-lang", REPO = "kho-bien-so-dep", FILE = "data.js", BRANCH = "main";
+  var API = "https://api.github.com/repos/" + OWNER + "/" + REPO;
+  var KEY = "bsd_admin_token";
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); };
+  var token = "", sha = "", data = null, original = "";
+
+  var INFO_FIELDS = [
+    ["hotline", "Hotline (số điện thoại)"], ["zalo", "Số Zalo"], ["messenger", "Link Messenger"],
+    ["facebook", "Link Facebook"], ["tiktok", "Link TikTok"], ["gioHoTro", "Giờ hỗ trợ"],
+    ["khauHieu", "Khẩu hiệu"], ["khuVuc", "Khu vực"], ["tenMien", "Tên miền"], ["chuSoHuu", "Chủ sở hữu"], ["ten", "Tên website"]
+  ];
+  var ST = { con: "Còn biển", trung: "Trúng đấu giá (đang bán)", coc: "Đã cọc", ban: "Đã bán" };
+
+  /* ---------- tiện ích ---------- */
+  function msg(id, type, text) { var el = $(id); el.className = "msg on " + type; el.innerHTML = text; }
+  function clearMsg(id) { $(id).className = "msg"; }
+  function b64dec(b) { var bin = atob(b.replace(/\s/g, "")); var u = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return new TextDecoder().decode(u); }
+  function b64enc(s) { var u = new TextEncoder().encode(s), bin = ""; for (var i = 0; i < u.length; i += 0x8000) bin += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(bin); }
+  function gh(path, opt) {
+    opt = opt || {};
+    opt.headers = { "Authorization": "Bearer " + token, "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" };
+    if (opt.body) opt.headers["Content-Type"] = "application/json";
+    return fetch(API + path, opt).then(function (r) {
+      return r.text().then(function (t) { var j = null; try { j = t ? JSON.parse(t) : null; } catch (e) {} if (!r.ok) { var er = new Error((j && j.message) || ("HTTP " + r.status)); er.status = r.status; throw er; } return j; });
+    });
+  }
+  function parseData(text) {
+    var f = new Function(text + "\n;return {SITE: typeof SITE!=='undefined'?SITE:{}, PLATES: typeof PLATES!=='undefined'?PLATES:[], PROVINCES: typeof PROVINCES!=='undefined'?PROVINCES:[], POSTS: typeof POSTS!=='undefined'?POSTS:[]};");
+    return f();
+  }
+  function normTail(t) {
+    var d = String(t).replace(/\D/g, "");
+    if (d.length === 5) return d.slice(0, 3) + "." + d.slice(3);
+    if (d.length === 4) return d;
+    return String(t).trim();
+  }
+  function validPlate(p) { return /^\d{2}[A-Z]{1,2}\d?$/.test(p[0]) && /^(\d{3}\.\d{2}|\d{4})$/.test(p[1]); }
+
+  /* ---------- tạo lại file data.js ---------- */
+  function q(s) { return JSON.stringify(s == null ? "" : String(s)); }
+  function serialize(d) {
+    var L = [];
+    L.push("/* =========================================================");
+    L.push("   DỮ LIỆU WEBSITE – sửa tại trang /admin hoặc trực tiếp ở file này");
+    L.push("   Cập nhật: " + new Date().toLocaleString("vi-VN"));
+    L.push("   ========================================================= */", "");
+    L.push("var SITE = {");
+    var keys = Object.keys(d.SITE);
+    keys.forEach(function (k, i) { L.push("  " + k + ": " + q(d.SITE[k]) + (i < keys.length - 1 ? "," : "")); });
+    L.push("};", "");
+    L.push("/* ---------------------------------------------------------");
+    L.push("   DANH SÁCH BIỂN SỐ");
+    L.push("   Mỗi dòng: [đầu biển, đuôi số, loại xe, giá, trạng thái]");
+    L.push("   - loại xe: \"oto\" hoặc \"xemay\"; giá: số tiền (đồng), 0 = \"Liên hệ\"");
+    L.push("   - trạng thái: \"con\" (còn), \"trung\" (trúng đấu giá, đang bán), \"coc\" (đã cọc), \"ban\" (đã bán)");
+    L.push("   --------------------------------------------------------- */");
+    L.push("var PLATES = [");
+    d.PLATES.forEach(function (p, i) { L.push("  [" + q(p[0]) + ", " + q(p[1]) + ", " + q(p[2]) + ", " + (+p[3] || 0) + ", " + q(p[4]) + "]" + (i < d.PLATES.length - 1 ? "," : "")); });
+    L.push("];", "");
+    L.push("/* Mã tỉnh dùng trong bộ lọc */");
+    L.push("var PROVINCES = [");
+    d.PROVINCES.forEach(function (p, i) { L.push("  [" + q(p[0]) + ", " + q(p[1]) + "]" + (i < d.PROVINCES.length - 1 ? "," : "")); });
+    L.push("];", "");
+    L.push("/* Bài viết */");
+    L.push("var POSTS = [");
+    d.POSTS.forEach(function (p, i) { L.push("  { t: " + q(p.t) + ", d: " + q(p.d) + ", tag: " + q(p.tag) + " }" + (i < d.POSTS.length - 1 ? "," : "")); });
+    L.push("];", "");
+    return L.join("\n");
+  }
+  function changed() { return data && JSON.stringify(data) !== original; }
+  function markDirty() {
+    var c = changed();
+    $("saveInfo").textContent = c ? "Có thay đổi chưa lưu." : "Chưa có thay đổi.";
+    $("saveInfo").style.color = c ? "var(--red)" : "";
+  }
+
+  /* ---------- đăng nhập ---------- */
+  window.login = function () {
+    token = $("tokIn").value.trim();
+    if (!token) { msg("loginMsg", "err", "Anh dán mã truy cập GitHub vào ô trên trước nhé."); return; }
+    $("loginBtn").disabled = true; msg("loginMsg", "warn", "Đang kiểm tra mã…");
+    gh("").then(function (repo) {
+      if (!repo.permissions || !repo.permissions.push) throw new Error("Mã này chưa có quyền ghi (Contents: Read and write).");
+      try { if ($("remember").checked) localStorage.setItem(KEY, token); else localStorage.removeItem(KEY); } catch (e) {}
+      return loadData();
+    }).then(function () {
+      $("loginBox").classList.add("hide"); $("app").classList.remove("hide"); $("saveBar").classList.remove("hide"); $("logoutBtn").classList.remove("hide");
+      clearMsg("loginMsg");
+    }).catch(function (e) {
+      var t = e.status === 401 ? "Mã không đúng hoặc đã hết hạn. Anh tạo mã mới theo hướng dẫn bên dưới." :
+        e.status === 404 ? "Mã chưa được cấp quyền cho kho kho-bien-so-dep. Anh chọn đúng kho khi tạo mã." : esc(e.message);
+      msg("loginMsg", "err", t);
+      try { localStorage.removeItem(KEY); } catch (er) {}
+    }).then(function () { $("loginBtn").disabled = false; });
+  };
+  window.logout = function () {
+    if (changed() && !window.confirm("Có thay đổi chưa lưu. Vẫn đăng xuất?")) return;
+    try { localStorage.removeItem(KEY); } catch (e) {}
+    location.reload();
+  };
+
+  function loadData() {
+    return gh("/contents/" + FILE + "?ref=" + BRANCH + "&t=" + Date.now()).then(function (f) {
+      sha = f.sha;
+      data = parseData(b64dec(f.content));
+      data.PLATES = data.PLATES.map(function (p) { return [p[0], p[1], p[2] || "oto", +p[3] || 0, p[4] || "con"]; });
+      original = JSON.stringify(data);
+      drawAll(); markDirty();
+    });
+  }
+  window.reload = function () {
+    if (changed() && !window.confirm("Bỏ hết thay đổi chưa lưu?")) return;
+    loadData().then(function () { msg("appMsg", "ok", "Đã tải lại dữ liệu đang có trên website."); });
+  };
+
+  /* ---------- vẽ giao diện ---------- */
+  function drawAll() { drawPlates(); drawInfo(); drawPosts(); }
+  window.tab = function (t) {
+    document.querySelectorAll(".tab").forEach(function (b) { b.classList.toggle("on", b.getAttribute("data-t") === t); });
+    document.querySelectorAll(".pane").forEach(function (p) { p.classList.toggle("on", p.id === "p-" + t); });
+  };
+
+  var origSet = {};
+  window.drawPlates = function () {
+    var o = JSON.parse(original).PLATES; origSet = {};
+    o.forEach(function (p) { origSet[p.join("|")] = 1; });
+    var fq = $("fq").value.replace(/\W/g, "").toLowerCase(), fs = $("fs").value, shown = 0;
+    var h = data.PLATES.map(function (p, i) {
+      if (fq && (p[0] + p[1]).replace(/\W/g, "").toLowerCase().indexOf(fq) < 0) return "";
+      if (fs && p[4] !== fs) return "";
+      shown++;
+      var cls = (origSet[p.join("|")] ? "" : "chg") + (validPlate(p) ? "" : " bad");
+      return '<tr class="' + cls + '" data-i="' + i + '">' +
+        '<td><span class="pv">' + esc(p[0]) + "-" + esc(p[1]) + "</span></td>" +
+        '<td><input class="pre" value="' + esc(p[0]) + '" onchange="setF(' + i + ',0,this.value)" aria-label="Đầu biển"></td>' +
+        '<td><input class="tail" value="' + esc(p[1]) + '" onchange="setF(' + i + ',1,this.value)" aria-label="Đuôi số"></td>' +
+        '<td><select class="vt" onchange="setF(' + i + ',2,this.value)" aria-label="Loại xe"><option value="oto"' + (p[2] === "oto" ? " selected" : "") + '>Ô tô</option><option value="xemay"' + (p[2] === "xemay" ? " selected" : "") + ">Xe máy</option></select></td>" +
+        '<td><input class="price" inputmode="numeric" value="' + (p[3] ? (+p[3]).toLocaleString("vi-VN") : "") + '" placeholder="Liên hệ" onchange="setF(' + i + ',3,this.value)" aria-label="Giá"></td>' +
+        '<td><select class="stt" onchange="setF(' + i + ',4,this.value)" aria-label="Trạng thái">' + Object.keys(ST).map(function (k) { return '<option value="' + k + '"' + (p[4] === k ? " selected" : "") + ">" + ST[k] + "</option>"; }).join("") + "</select></td>" +
+        '<td><button class="btn ghost sm" onclick="delRow(' + i + ')" aria-label="Xóa biển ' + esc(p[0] + "-" + p[1]) + '">Xóa</button></td></tr>';
+    }).join("");
+    $("rows").innerHTML = h || '<tr><td colspan="7" style="color:var(--mut);padding:16px">Không có biển phù hợp.</td></tr>';
+    $("cnt").textContent = "Hiển thị " + shown + " / " + data.PLATES.length + " biển";
+  };
+  window.setF = function (i, k, v) {
+    var p = data.PLATES[i];
+    if (k === 0) v = v.toUpperCase().replace(/[^0-9A-Z]/g, "");
+    if (k === 1) v = normTail(v);
+    if (k === 3) v = +String(v).replace(/\D/g, "") || 0;
+    p[k] = v; drawPlates(); markDirty();
+  };
+  window.addRow = function () {
+    data.PLATES.unshift(["35A", "", "oto", 0, "con"]);
+    $("fq").value = ""; $("fs").value = ""; drawPlates(); markDirty();
+    var first = document.querySelector("#rows input.tail"); if (first) first.focus();
+  };
+  window.delRow = function (i) {
+    var p = data.PLATES[i];
+    if (!window.confirm("Xóa biển " + p[0] + "-" + p[1] + " khỏi danh sách? (Chỉ mất khi bấm Lưu lên website)")) return;
+    data.PLATES.splice(i, 1); drawPlates(); markDirty();
+  };
+  window.bulkAdd = function () {
+    var lines = $("bulk").value.split(/\n/), added = 0, bad = [], dup = 0, st = $("bulkSt").value;
+    var have = {}; data.PLATES.forEach(function (p) { have[p[0] + "-" + p[1]] = 1; });
+    lines.forEach(function (ln) {
+      ln = ln.trim(); if (!ln) return;
+      var m = ln.toUpperCase().match(/^(\d{2}[A-Z]{1,2}\d?)\s*[-\s]\s*([\d.]{4,6})(?:\s+([\d.,]+))?/);
+      if (!m) { bad.push(ln); return; }
+      var p = [m[1], normTail(m[2]), /^\d{2}[A-Z]\d$/.test(m[1]) ? "xemay" : "oto", m[3] ? +m[3].replace(/\D/g, "") : 0, st];
+      if (!validPlate(p)) { bad.push(ln); return; }
+      if (have[p[0] + "-" + p[1]]) { dup++; return; }
+      have[p[0] + "-" + p[1]] = 1; data.PLATES.push(p); added++;
+    });
+    drawPlates(); markDirty();
+    msg("bulkMsg", bad.length ? "warn" : "ok", "Đã thêm " + added + " biển" + (dup ? ", bỏ qua " + dup + " biển trùng" : "") +
+      (bad.length ? ". Không đọc được: " + esc(bad.join(", ")) : "") + ". Nhớ bấm <b>Lưu lên website</b>.");
+    if (added) $("bulk").value = bad.join("\n");
+  };
+  function drawInfo() {
+    $("infoForm").innerHTML = INFO_FIELDS.map(function (f) {
+      return '<div><label for="i_' + f[0] + '">' + f[1] + '</label><input id="i_' + f[0] + '" value="' + esc(data.SITE[f[0]]) + '" oninput="setInfo(\'' + f[0] + '\',this.value)"></div>';
+    }).join("");
+  }
+  window.setInfo = function (k, v) { data.SITE[k] = v; markDirty(); };
+  function drawPosts() {
+    $("postList").innerHTML = data.POSTS.map(function (p, i) {
+      return '<div class="post"><div class="g2"><div><label>Tiêu đề</label><input value="' + esc(p.t) + '" oninput="setPost(' + i + ',\'t\',this.value)"></div>' +
+        '<div><label>Nhãn</label><input value="' + esc(p.tag) + '" oninput="setPost(' + i + ',\'tag\',this.value)"></div></div>' +
+        '<div><label>Mô tả ngắn</label><textarea rows="2" oninput="setPost(' + i + ',\'d\',this.value)">' + esc(p.d) + "</textarea></div>" +
+        '<div><button class="btn ghost sm" onclick="delPost(' + i + ')">Xóa bài</button></div></div>';
+    }).join("") || '<p style="color:var(--mut)">Chưa có bài viết.</p>';
+  }
+  window.setPost = function (i, k, v) { data.POSTS[i][k] = v; markDirty(); };
+  window.addPost = function () { data.POSTS.push({ t: "", d: "", tag: "Tin tức" }); drawPosts(); markDirty(); };
+  window.delPost = function (i) { if (!window.confirm("Xóa bài viết này?")) return; data.POSTS.splice(i, 1); drawPosts(); markDirty(); };
+
+  /* ---------- lưu ---------- */
+  window.save = function () {
+    if (!changed()) { msg("appMsg", "warn", "Chưa có thay đổi nào để lưu."); return; }
+    var bad = data.PLATES.filter(function (p) { return !validPlate(p); });
+    if (bad.length) { msg("appMsg", "err", "Có " + bad.length + " biển sai định dạng (ô viền đỏ): " + esc(bad.map(function (p) { return p[0] + "-" + p[1]; }).join(", ")) + ". Đầu biển dạng 35A hoặc 35B1, đuôi số dạng 999.99."); tab("plates"); return; }
+    var seen = {}, dups = [];
+    data.PLATES.forEach(function (p) { var k = p[0] + "-" + p[1]; if (seen[k]) dups.push(k); seen[k] = 1; });
+    if (dups.length) { msg("appMsg", "err", "Biển bị trùng: " + esc(dups.join(", ")) + ". Anh xóa bớt một dòng rồi lưu lại."); tab("plates"); return; }
+    var text = serialize(data);
+    try { parseData(text); } catch (e) { msg("appMsg", "err", "Lỗi tạo dữ liệu: " + esc(e.message)); return; }
+    $("saveBtn").disabled = true; msg("appMsg", "warn", "Đang lưu lên GitHub…");
+    gh("/contents/" + FILE, { method: "PUT", body: JSON.stringify({ message: "Cap nhat du lieu tu trang admin", content: b64enc(text), sha: sha, branch: BRANCH }) })
+      .then(function (r) {
+        sha = r.content.sha; original = JSON.stringify(data); drawPlates(); markDirty();
+        msg("appMsg", "ok", "✔ Đã lưu. Website sẽ cập nhật sau khoảng 1–2 phút. <a href=\"../\" target=\"_blank\" rel=\"noopener\">Mở website ↗</a>");
+      }).catch(function (e) {
+        msg("appMsg", "err", e.status === 409 ? "Dữ liệu trên GitHub vừa bị sửa ở nơi khác. Anh bấm <b>Hủy thay đổi</b> để tải bản mới rồi sửa lại." :
+          e.status === 401 || e.status === 403 ? "Mã truy cập hết hạn hoặc không đủ quyền ghi. Anh đăng xuất và đăng nhập bằng mã mới." : "Lưu không được: " + esc(e.message));
+      }).then(function () { $("saveBtn").disabled = false; });
+  };
+  window.addEventListener("beforeunload", function (e) { if (changed()) { e.preventDefault(); e.returnValue = ""; } });
+
+  /* ---------- tự đăng nhập nếu đã ghi nhớ ---------- */
+  try { var t = localStorage.getItem(KEY); if (t) { $("tokIn").value = t; window.login(); } } catch (e) {}
+  $("tokIn").addEventListener("keydown", function (e) { if (e.key === "Enter") window.login(); });
+})();
+</script>
+</body>
+</html>

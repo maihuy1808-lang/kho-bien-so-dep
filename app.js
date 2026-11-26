@@ -262,6 +262,12 @@
     $("posts").innerHTML = POSTS.map(function (p) { return '<article><span class="tg">' + esc(p.tag) + "</span><h3>" + esc(p.t) + "</h3><p>" + esc(p.d) + "</p></article>"; }).join("");
     $("stTotal").textContent = ITEMS.filter(forSale).length;
     $("stNB").textContent = ITEMS.filter(function (it) { return it.st === "trung"; }).length;
+    // Ẩn mục menu không có biển nào đang bán (tự hiện lại khi có)
+    document.querySelectorAll("nav a[data-t], nav a[data-v]").forEach(function (a) {
+      var t = a.getAttribute("data-t"), v = a.getAttribute("data-v");
+      var n = ITEMS.filter(function (it) { return forSale(it) && (!t || it.tags.indexOf(t) > -1) && (!v || it.v === v); }).length;
+      a.hidden = n === 0;
+    });
     updFav(); render();
   }
   init();
