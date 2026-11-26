@@ -25,6 +25,8 @@
   </div>
   <nav><div class="w">
     <a href="#kho" onclick="quick({})">Tất cả biển</a>
+    <a href="#kho" onclick="quick({hot:1})">🔥 Nổi bật</a>
+    <a href="#kho" data-sale onclick="quick({sale:1})">Giảm giá</a>
     <a href="#kho" data-t="Ngũ quý" onclick="quick({t:'Ngũ quý'})">Ngũ quý</a>
     <a href="#kho" data-t="Tứ quý" onclick="quick({t:'Tứ quý'})">Tứ quý</a>
     <a href="#kho" data-t="Thần tài" onclick="quick({t:'Thần tài'})">Thần tài</a>
@@ -61,6 +63,7 @@
     <select id="t" aria-label="Loại biển"><option value="">Loại biển</option></select>
     <select id="m" aria-label="Mệnh"><option value="">Ngũ hành của biển</option><option>Kim</option><option>Mộc</option><option>Thủy</option><option>Hỏa</option><option>Thổ</option></select>
     <select id="n" aria-label="Số nút"><option value="">Số nút</option><option value="9">9 nút</option><option value="8">8 nút</option><option value="7">7 nút</option><option value="10">10 nút</option><option value="6">6 nút trở xuống</option></select>
+    <select id="dt" aria-label="Thời gian đăng"><option value="">Thời gian đăng</option><option value="1">Hôm nay</option><option value="7">7 ngày qua</option><option value="30">30 ngày qua</option><option value="90">3 tháng qua</option></select>
     <select id="g" aria-label="Khoảng giá"><option value="">Khoảng giá</option><option value="a">Dưới 100 triệu</option><option value="b">100 – 300 triệu</option><option value="c">300 triệu – 1 tỷ</option><option value="d">Trên 1 tỷ</option></select>
     <button class="btn" onclick="apply()">Lọc biển</button>
   </div>
@@ -73,7 +76,7 @@
   <div class="sh"><h2>Xem phong thủy biển số</h2><span>Mang tính tham khảo</span></div>
   <div class="pt">
     <div class="panel">
-      <h2>Chấm điểm một biển số</h2>
+      <h2>Chấm điểm &amp; dịch nghĩa biển số</h2>
       <form class="ip" onsubmit="event.preventDefault();checkPlate()">
         <input class="f" id="ckIn" placeholder="Nhập biển, ví dụ 35A-568.68">
         <button class="btn">Xem</button>
@@ -151,6 +154,7 @@
 <div class="toast" id="toast"></div>
 
 <script>document.write('<script src="data.js?v=' + Math.floor(Date.now() / 60000) + '"><\/script>');</script>
+<script src="meaning.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

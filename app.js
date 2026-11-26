@@ -63,25 +63,41 @@
   }
 
   /* ---------- Chuẩn bị dữ liệu ---------- */
+  var TODAY = new Date(); TODAY.setHours(0, 0, 0, 0);
+  function daysAgo(s) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || ""); if (!m) return 9999;
+    return Math.round((TODAY - new Date(+m[1], +m[2] - 1, +m[3])) / 864e5);
+  }
+  function fmtDate(s) { var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || ""); return m ? m[3] + "/" + m[2] + "/" + m[1] : ""; }
+  function meaningOf(tail, note) {
+    if (note) { var parts = String(note).split(/\s*\|\s*/); return { title: parts[0], verse: parts.slice(1).join(" / "), reading: "", custom: true }; }
+    return window.PlateMeaning ? window.PlateMeaning(tail) : null;
+  }
   var ITEMS = PLATES.map(function (r, i) {
-    var d = digitsOf(r[1]);
+    var d = digitsOf(r[1]), price = +r[3] || 0, old = +r[6] || 0;
+    var sale = price > 0 && old > price;
     return {
-      id: i, pre: r[0], tail: r[1], v: r[2], price: +r[3] || 0, st: r[4] || "con",
+      id: i, pre: r[0], tail: r[1], v: r[2], price: price, st: r[4] || "con",
+      hot: +r[5] === 1, old: sale ? old : 0, sale: sale, pct: sale ? Math.round((1 - price / old) * 100) : 0,
+      date: r[7] || "", age: daysAgo(r[7]), mean: meaningOf(r[1], r[8]),
       tags: classify(r[1]), nut: nut(r[0] + r[1]), hanh: HANH_BY_DIGIT[+d[d.length - 1]],
       key: (r[0] + r[1]).replace(/\W/g, "").toLowerCase()
     };
   });
   var fav = {};
   try { fav = JSON.parse(localStorage.getItem("bsd_fav") || "{}"); } catch (e) { fav = {}; }
-  var state = { p: "", v: "", t: "", m: "", n: "", g: "", q: "", onlyFav: false, sort: "", ids: null, label: "" };
+  function blank() { return { p: "", v: "", t: "", m: "", n: "", g: "", dt: "", q: "", sale: 0, hot: 0, onlyFav: false, sort: "", ids: null, label: "" }; }
+  var state = blank();
+  var DAY_RANGES = { "1": "Đăng hôm nay", "7": "Đăng trong 7 ngày", "30": "Đăng trong 30 ngày", "90": "Đăng trong 3 tháng" };
 
   function plateHtml(it, big) {
-    var c = "pl" + (it.v === "xemay" ? " xm" : "") + (big ? " big" : "");
+    var c = "pl" + (it.v === "xemay" ? " xm" : "") + (big ? " big" : ""), h;
     if (it.v === "xemay") {
       var top = it.pre.slice(0, 2) + "-" + it.pre.slice(2);
-      return '<div class="' + c + '"><i>' + esc(top) + "</i>" + esc(it.tail) + "</div>";
-    }
-    return '<div class="' + c + '">' + esc(it.pre) + "-" + esc(it.tail) + "</div>";
+      h = '<div class="' + c + '"><i>' + esc(top) + "</i>" + esc(it.tail) + "</div>";
+    } else h = '<div class="' + c + '">' + esc(it.pre) + "-" + esc(it.tail) + "</div>";
+    // Biển nổi bật: viền sáng chạy quanh biển
+    return it.hot && it.st !== "ban" ? '<div class="glow' + (it.v === "xemay" ? " xm" : "") + (big ? " big" : "") + '">' + h + "</div>" : h;
   }
   function money(v) {
     if (v >= 1e9) return (Math.round(v / 1e7) / 100).toLocaleString("vi-VN") + " tỷ";
@@ -89,32 +105,42 @@
     return v.toLocaleString("vi-VN") + " đ";
   }
   function priceTxt(it) { return it.st === "ban" ? "Đã bán" : it.price ? money(it.price) : "Giá: Liên hệ"; }
+  function priceHtml(it) {
+    if (it.sale && it.st !== "ban") return '<s class="old">' + money(it.old) + "</s> " + money(it.price) + ' <span class="off">-' + it.pct + "%</span>";
+    return esc(priceTxt(it));
+  }
   var PRICE_RANGES = { a: [0, 1e8, "Dưới 100 triệu"], b: [1e8, 3e8, "100 – 300 triệu"], c: [3e8, 1e9, "300 triệu – 1 tỷ"], d: [1e9, 1e13, "Trên 1 tỷ"] };
   var ST_TXT = { con: "Còn biển", coc: "Đã cọc", ban: "Đã bán", trung: "Trúng đấu giá" };
   function forSale(it) { return it.st === "con" || it.st === "coc" || it.st === "trung"; }
 
   function card(it) {
     var tg = it.tags.slice(0, 2).map(function (t) { return '<span class="tg">' + t + "</span>"; }).join("") || '<span class="tg n">Biển thường</span>';
-    return '<div class="pc' + (it.st === "ban" ? " sold" : "") + '" onclick="openPlate(' + it.id + ')">' +
+    var badges = (it.hot && it.st !== "ban" ? '<span class="bd hotb">🔥 Nổi bật</span>' : "") +
+      (it.sale && it.st !== "ban" ? '<span class="bd saleb">Giảm ' + it.pct + "%</span>" : "") +
+      (it.age <= 7 && it.st !== "ban" ? '<span class="bd newb">Mới</span>' : "");
+    return '<div class="pc' + (it.st === "ban" ? " sold" : "") + (it.hot && it.st !== "ban" ? " hot" : "") + '" onclick="openPlate(' + it.id + ')">' +
       (it.st !== "con" ? '<span class="st ' + it.st + '">' + ST_TXT[it.st] + "</span>" : "") +
+      (badges ? '<div class="bds">' + badges + "</div>" : "") +
       plateHtml(it) +
       '<div class="tags">' + tg + "</div>" +
+      (it.mean ? '<div class="mean" title="' + esc(it.mean.verse || "") + '">“' + esc(it.mean.title) + '”</div>' : "") +
       '<div class="mt"><span>' + it.nut + " nút · " + mx(it.hanh) + '</span><span>' + (it.v === "xemay" ? "Xe máy" : "Ô tô") + "</span></div>" +
-      '<div class="pr">' + priceTxt(it) + "</div>" +
+      '<div class="pr">' + priceHtml(it) + "</div>" +
       '<div class="row"><button class="a" onclick="event.stopPropagation();openPlate(' + it.id + ')">Chi tiết</button>' +
       '<button class="b" onclick="event.stopPropagation();toggleFav(' + it.id + ')">' + (fav[it.id] ? "♥ Đã lưu" : "♡ Quan tâm") + "</button></div></div>";
   }
 
   function section(title, sub, list, withSort) {
     var head = '<div class="sh"><h2>' + title + "</h2><span>" + sub +
-      (withSort ? ' &nbsp;<select class="sort" onchange="setSort(this.value)" aria-label="Sắp xếp"><option value="">Sắp xếp: mặc định</option><option value="nut"' + (state.sort === "nut" ? " selected" : "") + '>Số nút cao trước</option><option value="az"' + (state.sort === "az" ? " selected" : "") + '>Theo đầu biển</option><option value="giatang"' + (state.sort === "giatang" ? " selected" : "") + '>Giá thấp → cao</option><option value="giagiam"' + (state.sort === "giagiam" ? " selected" : "") + ">Giá cao → thấp</option></select>" : "") +
+      (withSort ? ' &nbsp;<select class="sort" onchange="setSort(this.value)" aria-label="Sắp xếp"><option value="">Sắp xếp: mặc định</option><option value="nut"' + (state.sort === "nut" ? " selected" : "") + '>Số nút cao trước</option><option value="az"' + (state.sort === "az" ? " selected" : "") + '>Theo đầu biển</option><option value="giatang"' + (state.sort === "giatang" ? " selected" : "") + '>Giá thấp → cao</option><option value="giagiam"' + (state.sort === "giagiam" ? " selected" : "") + '>Giá cao → thấp</option><option value="moi"' + (state.sort === "moi" ? " selected" : "") + ">Mới đăng trước</option></select>" : "") +
       "</span></div>";
     if (!list.length) return head + '<div class="empty">Chưa có biển phù hợp. <a href="#lh" style="color:var(--red);font-weight:700">Gửi yêu cầu</a> để được tìm giúp theo tiêu chí.</div>';
     return head + '<div class="gr">' + list.map(card).join("") + "</div>";
   }
 
-  function readForm() { ["p", "v", "t", "m", "n", "g"].forEach(function (k) { state[k] = $(k).value; }); state.q = $("q").value.replace(/\W/g, "").toLowerCase(); }
-  function writeForm() { ["p", "v", "t", "m", "n", "g"].forEach(function (k) { $(k).value = state[k]; }); }
+  var FIELDS = ["p", "v", "t", "m", "n", "g", "dt"];
+  function readForm() { FIELDS.forEach(function (k) { state[k] = $(k).value; }); state.q = $("q").value.replace(/\W/g, "").toLowerCase(); }
+  function writeForm() { FIELDS.forEach(function (k) { $(k).value = state[k]; }); }
   function byPrice(desc) { return function (a, b) { var x = a.price || (desc ? -1 : 1e15), y = b.price || (desc ? -1 : 1e15); return desc ? y - x : x - y; }; }
 
   function render() {
@@ -122,6 +148,7 @@
     if (s.p) chips.push("Mã " + s.p); if (s.v) chips.push(s.v === "oto" ? "Ô tô" : "Xe máy");
     if (s.t) chips.push(s.t); if (s.m) chips.push("Hành " + s.m); if (s.n) chips.push(s.n === "6" ? "≤ 6 nút" : s.n + " nút");
     if (s.g) chips.push(PRICE_RANGES[s.g][2]);
+    if (s.dt) chips.push(DAY_RANGES[s.dt]); if (s.sale) chips.push("Đang giảm giá"); if (s.hot) chips.push("Biển nổi bật");
     if (s.q) chips.push('Tìm "' + $("q").value + '"'); if (s.onlyFav) chips.push("Đã quan tâm"); if (s.ids) chips.push(s.label);
     $("chips").innerHTML = chips.map(function (c) { return '<span class="chip on">' + esc(c) + "</span>"; }).join("") +
       (chips.length ? '<button class="chip" onclick="resetAll()">Xóa lọc ✕</button>' : "");
@@ -131,8 +158,10 @@
       return (!s.p || it.pre.indexOf(s.p) === 0) && (!s.v || it.v === s.v) && (!s.t || it.tags.indexOf(s.t) > -1) &&
         (!s.m || it.hanh === s.m) && (!s.n || (s.n === "6" ? it.nut <= 6 : it.nut === +s.n)) &&
         (!s.q || it.key.indexOf(s.q) > -1) && (!s.onlyFav || fav[it.id]) && (!s.ids || s.ids.indexOf(it.id) > -1) &&
-        (!s.g || (it.price >= PRICE_RANGES[s.g][0] && it.price < PRICE_RANGES[s.g][1] && it.st !== "ban"));
+        (!s.g || (it.price >= PRICE_RANGES[s.g][0] && it.price < PRICE_RANGES[s.g][1] && it.st !== "ban")) &&
+        (!s.dt || it.age < +s.dt) && (!s.sale || (it.sale && forSale(it))) && (!s.hot || (it.hot && forSale(it)));
     });
+    if (s.sort === "moi") r.sort(function (a, b) { return a.age - b.age; });
     if (s.sort === "giatang") r.sort(byPrice(false));
     if (s.sort === "giagiam") r.sort(byPrice(true));
     if (s.sort === "nut") r.sort(function (a, b) { return (b.nut === 10 ? 0 : b.nut) - (a.nut === 10 ? 0 : a.nut); });
@@ -141,13 +170,18 @@
     var h;
     if (!chips.length) {
       var avail = r.filter(forSale);
-      var vip = avail.filter(function (it) { return it.v === "oto" && /Ngũ quý|Tứ quý/.test(it.tags.join()); }).sort(byPrice(true)).slice(0, 8);
-      if (vip.length < 4) vip = avail.filter(function (it) { return it.v === "oto" && /Ngũ quý|Tứ quý|Thần tài|Phát lộc|Sảnh tiến/.test(it.tags.join()); }).sort(byPrice(true)).slice(0, 8);
-      var won = avail.filter(function (it) { return it.st === "trung" && vip.indexOf(it) < 0; });
-      var oto = avail.filter(function (it) { return it.v === "oto" && it.st !== "trung" && vip.indexOf(it) < 0; });
-      var xm = avail.filter(function (it) { return it.v === "xemay"; }).sort(byPrice(true));
+      // Biển nổi bật: do anh chọn trong /admin; chưa chọn biển nào thì web tự chọn ngũ quý, tứ quý giá cao
+      var vip = avail.filter(function (it) { return it.hot; }).sort(byPrice(true));
+      var auto = !vip.length;
+      if (auto) vip = avail.filter(function (it) { return it.v === "oto" && /Ngũ quý|Tứ quý/.test(it.tags.join()); }).sort(byPrice(true)).slice(0, 8);
+      var saleL = avail.filter(function (it) { return it.sale && vip.indexOf(it) < 0; }).sort(function (a, b) { return b.pct - a.pct; });
+      var taken = function (it) { return vip.indexOf(it) > -1 || saleL.indexOf(it) > -1; };
+      var won = avail.filter(function (it) { return it.st === "trung" && !taken(it); });
+      var oto = avail.filter(function (it) { return it.v === "oto" && it.st !== "trung" && !taken(it); });
+      var xm = avail.filter(function (it) { return it.v === "xemay" && !taken(it); }).sort(byPrice(true));
       var sold = r.filter(function (it) { return it.st === "ban"; });
-      h = (vip.length ? section("Biển số VIP nổi bật", "Ngũ quý · Tứ quý", vip) : "") +
+      h = (vip.length ? '<div id="noibat">' + section("🔥 Biển số nổi bật", auto ? "Ngũ quý · Tứ quý" : vip.length + " biển chọn lọc", vip) + "</div>" : "") +
+        (saleL.length ? '<div id="giamgia">' + section("Đang giảm giá", saleL.length + " biển · giá tốt có hạn", saleL) + "</div>" : "") +
         (oto.length ? section("Biển ô tô đang bán", oto.length + " biển", oto) : "") +
         (xm.length ? '<div id="xemay">' + section("Biển số xe máy", xm.length + " biển", xm) + "</div>" : "") +
         (won.length ? '<div id="trung">' + section("Biển trúng đấu giá đang chào bán", won.length + " biển · bước giá 5.000.000", won) + "</div>" : "") +
@@ -162,7 +196,7 @@
   window.apply = function () { readForm(); state.ids = null; render(); };
   window.doSearch = function () { readForm(); state.ids = null; render(); go("out"); };
   window.setSort = function (v) { state.sort = v; render(); };
-  window.resetAll = function () { state = { p: "", v: "", t: "", m: "", n: "", g: "", q: "", onlyFav: false, sort: "", ids: null, label: "" }; writeForm(); $("q").value = ""; render(); };
+  window.resetAll = function () { state = blank(); writeForm(); $("q").value = ""; render(); };
   window.quick = function (o) { window.resetAll(); for (var k in o) state[k] = o[k]; writeForm(); render(); };
   window.toggleFavView = function () { state.onlyFav = !state.onlyFav; render(); go("kho"); };
   window.toggleFav = function (id) {
@@ -190,13 +224,21 @@
       "<dt>Hợp người mệnh</dt><dd>" + it.hanh + ", " + SINH[it.hanh] + "</dd>" +
       "<dt>Loại xe</dt><dd>" + (it.v === "xemay" ? "Xe máy" : "Ô tô") + "</dd>" +
       "<dt>Tình trạng</dt><dd>" + (it.st === "trung" ? "Đang chào bán · biển đã trúng đấu giá" : ST_TXT[it.st]) + "</dd>" +
-      '<dt>Giá</dt><dd style="color:var(--red)">' + priceTxt(it) + "</dd></dl>" +
+      (it.date ? "<dt>Ngày đăng</dt><dd>" + fmtDate(it.date) + (it.age <= 0 ? " (hôm nay)" : it.age < 9999 ? " (" + it.age + " ngày trước)" : "") + "</dd>" : "") +
+      '<dt>Giá</dt><dd style="color:var(--red)">' + priceHtml(it) + "</dd></dl>" +
+      meaningHtml(it.mean) +
       '<div class="row"><a class="btn" href="' + c.tel + '" onclick="return needContact(\'' + c.tel + '\')">📞 Gọi tư vấn</a>' +
       '<a class="btn" style="background:#0068ff" href="' + c.zalo + '" target="_blank" rel="noopener" onclick="copyTxt(\'Tôi quan tâm biển ' + full + '\');return needContact(\'' + c.zalo + '\')">Nhắn Zalo</a></div>' +
       '<div class="row" style="margin-top:8px"><button class="btn ghost" onclick="toggleFav(' + id + ')">' + (fav[id] ? "♥ Bỏ quan tâm" : "♡ Quan tâm") + '</button>' +
       '<button class="btn ghost" onclick="copyTxt(\'' + full + '\')">Sao chép biển</button></div>';
     $("md").classList.add("on");
   };
+  function meaningHtml(m) {
+    if (!m) return "";
+    return '<div class="ynghia"><b>Ý nghĩa biển số</b><p class="yt">“' + esc(m.title) + '”</p>' +
+      (m.verse ? '<p class="tho">' + esc(m.verse).split(" / ").join("<br>") + "</p>" : "") +
+      (m.reading ? '<p class="doc">Đọc từng số: ' + esc(m.reading) + "</p>" : "") + "</div>";
+  }
   window.closeMd = function () { $("md").classList.remove("on"); };
   document.addEventListener("keydown", function (e) { if (e.key === "Escape") window.closeMd(); });
 
@@ -221,7 +263,8 @@
     box.innerHTML = "<h3>" + esc(raw) + " &nbsp;" + "★★★★★".slice(0, stars) + '<span style="opacity:.3">' + "★★★★★".slice(stars) + "</span></h3>" +
       "<p><b>Số nút:</b> " + nutText(n) + "</p>" +
       "<p><b>Ngũ hành:</b> " + mx(h) + " – hợp người mệnh " + h + " và " + SINH[h] + "</p>" +
-      "<p><b>Loại biển:</b> " + (tags.join(", ") || "Không thuộc dạng số đẹp phổ biến") + "</p>";
+      "<p><b>Loại biển:</b> " + (tags.join(", ") || "Không thuộc dạng số đẹp phổ biến") + "</p>" +
+      meaningHtml(window.PlateMeaning ? window.PlateMeaning(d) : null);
     box.classList.add("on");
   };
   window.checkYear = function () {
@@ -277,9 +320,9 @@
     $("stTotal").textContent = ITEMS.filter(forSale).length;
     $("stNB").textContent = ITEMS.filter(function (it) { return it.st === "trung"; }).length;
     // Ẩn mục menu không có biển nào đang bán (tự hiện lại khi có)
-    document.querySelectorAll("nav a[data-t], nav a[data-v]").forEach(function (a) {
-      var t = a.getAttribute("data-t"), v = a.getAttribute("data-v");
-      var n = ITEMS.filter(function (it) { return forSale(it) && (!t || it.tags.indexOf(t) > -1) && (!v || it.v === v); }).length;
+    document.querySelectorAll("nav a[data-t], nav a[data-v], nav a[data-sale]").forEach(function (a) {
+      var t = a.getAttribute("data-t"), v = a.getAttribute("data-v"), sl = a.hasAttribute("data-sale");
+      var n = ITEMS.filter(function (it) { return forSale(it) && (!t || it.tags.indexOf(t) > -1) && (!v || it.v === v) && (!sl || it.sale); }).length;
       a.hidden = n === 0;
     });
     updFav(); render();
