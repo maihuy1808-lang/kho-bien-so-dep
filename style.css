@@ -184,7 +184,7 @@ footer p{margin:6px 0}
 
 /* Bảng tin video TikTok */
 #bangtin{margin-bottom:28px}
-.vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
+.vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px}
 .vc{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh);display:flex;flex-direction:column}
 .vf{position:relative;aspect-ratio:9/16;background:#000;max-height:560px}
 .vf iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
@@ -195,7 +195,7 @@ footer p{margin:6px 0}
 .va a{font-size:13px;font-weight:700;color:var(--red)}
 .va button{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;padding:5px 12px;font-weight:700;font-size:13px;cursor:pointer}
 .vmore{text-align:center;margin:14px 0}
-@media(max-width:600px){.vgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.vb{padding:8px}.vt{font-size:13px}.va{flex-direction:column;align-items:flex-start;gap:6px}}
+@media(max-width:600px){.vgrid{grid-template-columns:1fr}.vf{max-height:none}}
 .vload{color:var(--mut);text-align:center;padding:20px}
 .ttch{margin-top:14px}
 .ttch-h{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}

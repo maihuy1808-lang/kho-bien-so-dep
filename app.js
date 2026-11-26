@@ -292,7 +292,7 @@
   /* ---------- Bảng tin: video TikTok ---------- */
   var VIDS = (typeof VIDEOS !== "undefined" ? VIDEOS : []).filter(function (v) { return /^\d{8,25}$/.test(String(v.id)); });
   var TT_USER = "mrxuanhuy";
-  var vShown = 6;
+  var vStep = window.innerWidth < 600 ? 3 : 6, vShown = vStep;
   function ttUrl(id) { return "https://www.tiktok.com/@" + TT_USER + "/video/" + id; }
   function ttPlayer(id) { return "https://www.tiktok.com/player/v1/" + id + "?music_info=0&description=1&rel=0&native_context_menu=0&closed_caption=0"; }
   function plateKey(s) { return String(s || "").toUpperCase().replace(/[^0-9A-Z]/g, ""); }
@@ -309,7 +309,7 @@
     g.innerHTML = VIDS.slice(0, vShown).map(videoCard).join("");
     $("vmoreBtn").hidden = vShown >= VIDS.length;
   }
-  window.moreVideos = function () { vShown += 6; renderVideos(); };
+  window.moreVideos = function () { vShown += vStep; renderVideos(); };
   window.shareVideo = function (id) {
     var u = ttUrl(id);
     if (navigator.share) { navigator.share({ title: "Video biển số đẹp – Mr Xuân Huy", url: u }).catch(function () {}); }
