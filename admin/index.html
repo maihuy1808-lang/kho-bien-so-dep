@@ -228,7 +228,12 @@ label{font-size:13px;color:var(--mut);display:block;margin-bottom:4px}
   /* ---------- đăng nhập ---------- */
   window.login = function () {
     token = $("tokIn").value.trim();
+    token = token.replace(/\s+/g, "");
     if (!token) { msg("loginMsg", "err", "Anh dán mã truy cập GitHub vào ô trên trước nhé."); return; }
+    if (!/^(github_pat_|ghp_)[A-Za-z0-9_]{20,}$/.test(token)) {
+      msg("loginMsg", "err", "Nội dung vừa dán không phải mã truy cập. Mã đúng là một dòng dài bắt đầu bằng <b>github_pat_</b> (dài khoảng 90 ký tự). Anh vào GitHub bấm <b>Regenerate token</b> rồi bấm biểu tượng 📋 để chép lại nhé.");
+      return;
+    }
     $("loginBtn").disabled = true; msg("loginMsg", "warn", "Đang kiểm tra mã…");
     gh("").then(function (repo) {
       if (!repo.permissions || !repo.permissions.push) throw new Error("Mã này chưa có quyền ghi (Contents: Read and write).");
