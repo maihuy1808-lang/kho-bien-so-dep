@@ -1,6 +1,6 @@
 /* =========================================================
    DỮ LIỆU WEBSITE – sửa tại trang /admin hoặc trực tiếp ở file này
-   Cập nhật: 21:36:44 26/11/2026
+   Cập nhật: 21:58:52 26/11/2026
    ========================================================= */
 
 var SITE = {
@@ -20,16 +20,16 @@ var SITE = {
 /* ---------------------------------------------------------
    DANH SÁCH BIỂN SỐ
    Mỗi dòng: [đầu biển, đuôi số, loại xe, giá, trạng thái, nổi bật, giá cũ, ngày đăng, ý nghĩa riêng]
+   - loại xe: "oto" hoặc "xemay"; giá: số tiền (đồng), 0 = "Liên hệ"
+   - trạng thái: "con" (còn), "trung" (trúng đấu giá, đang bán), "coc" (đã cọc), "ban" (đã bán)
    - nổi bật: 1 = hiện ở mục "Biển nổi bật" (có hiệu ứng), 0 = không
    - giá cũ: giá trước khi giảm (0 = không giảm giá)
    - ngày đăng: "năm-tháng-ngày"; ý nghĩa riêng: để trống thì web tự dịch nghĩa
-   - loại xe: "oto" hoặc "xemay"; giá: số tiền (đồng), 0 = "Liên hệ"
-   - trạng thái: "con" (còn), "trung" (trúng đấu giá, đang bán), "coc" (đã cọc), "ban" (đã bán)
    --------------------------------------------------------- */
 var PLATES = [
   ["35A", "666.66", "oto", 1550000000, "trung", 1, 0, "2026-11-26", ""],
   ["35A", "777.77", "oto", 1450000000, "trung", 1, 0, "2026-11-26", ""],
-  ["35A", "888.88", "oto", 3300000000, "trung", 1, 0, "2026-11-26", ""],
+  ["35A", "888.88", "oto", 3300000000, "trung", 1, 3500000000, "2026-11-26", ""],
   ["35A", "899.99", "oto", 1550000000, "trung", 1, 0, "2026-11-26", ""],
   ["35A", "988.88", "oto", 1000000000, "trung", 1, 0, "2026-11-26", ""],
   ["35A", "568.89", "oto", 145000000, "trung", 0, 0, "2026-11-26", ""],
