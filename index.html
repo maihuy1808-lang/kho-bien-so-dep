@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kho Biển Số Đẹp – Mai Xuân Huy · Ninh Bình</title>
+<meta name="description" content="Kho biển số đẹp ô tô, xe máy: ngũ quý, tứ quý, thần tài, phát lộc. Tra cứu biển hợp mệnh, tư vấn đấu giá hộ tại Ninh Bình.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="top"><div class="w">
+  <span>📍 <span data-site="khuVuc"></span> · Hỗ trợ <span data-site="gioHoTro"></span></span>
+  <span>Hotline/Zalo: <b id="hotTxt"></b></span>
+</div></div>
+
+<header>
+  <div class="w hd">
+    <a class="logo" href="#"><span class="mk">BSĐ</span><span><b>KHO BIỂN SỐ ĐẸP</b><small>Mai Xuân Huy · Ninh Bình</small></span></a>
+    <form class="sr" onsubmit="event.preventDefault();doSearch()">
+      <input id="q" type="search" placeholder="Tìm biển: 888, 35A, 6868…" aria-label="Tìm biển số">
+      <button>Tìm</button>
+    </form>
+    <button class="fav" id="favBtn" onclick="toggleFavView()">♡ Quan tâm<b id="fc">0</b></button>
+  </div>
+  <nav><div class="w">
+    <a href="#kho" onclick="quick({})">Tất cả biển</a>
+    <a href="#kho" onclick="quick({t:'Ngũ quý'})">Ngũ quý</a>
+    <a href="#kho" onclick="quick({t:'Thần tài'})">Thần tài</a>
+    <a href="#kho" onclick="quick({t:'Phát lộc'})">Phát lộc</a>
+    <a href="#kho" onclick="quick({v:'xemay'})">Biển xe máy</a>
+    <a href="#kho" onclick="quick({p:'35'})">Biển Ninh Bình</a>
+    <a href="#phongthuy">Xem phong thủy</a>
+    <a href="#trung" onclick="quick({})">Biển trúng đấu giá</a>
+    <a href="#dichvu">Đấu giá hộ</a>
+    <a href="#tin">Tin tức</a>
+    <a href="#lh">Liên hệ</a>
+  </div></nav>
+</header>
+
+<main class="w">
+
+<section class="hero">
+  <div class="bn b1">
+    <h1>Biển số đẹp, hợp mệnh<br>cho xe của bạn</h1>
+    <p>Tra cứu kho biển ô tô, xe máy theo đầu số, loại biển, số nút và ngũ hành. Tư vấn rõ ràng, hỗ trợ hồ sơ theo đúng quy định.</p>
+    <div class="demo"><div class="pl" style="font-size:20px">35A-999.29</div><div class="pl" style="font-size:20px">35A-977.79</div></div>
+    <div class="stats"><div><b id="stTotal">0</b>biển đang bán</div><div><a href="#trung"><b id="stNB">0</b>biển trúng đấu giá</a></div><div><b>8h–22h30</b>tư vấn mỗi ngày</div></div>
+  </div>
+  <div class="bn b2"><h3>Nhận đấu giá hộ</h3><p class="s">Tư vấn chọn biển, đăng ký, theo sát phiên đấu giá cùng bạn.</p><a class="cta" href="#dichvu">Xem quy trình</a></div>
+  <div class="bn b3"><h3>Mua xe + chọn biển hợp tuổi</h3><p class="s">Tư vấn xe VinFast và gợi ý biển hợp mệnh chủ xe.</p><a class="cta" href="#lh">Nhận báo giá</a></div>
+</section>
+
+<section class="panel" id="kho">
+  <h2>Bộ lọc tìm biển</h2>
+  <div class="fg">
+    <select id="p" aria-label="Mã tỉnh"><option value="">Mã tỉnh / thành phố</option></select>
+    <select id="v" aria-label="Loại xe"><option value="">Loại xe</option><option value="oto">Ô tô</option><option value="xemay">Xe máy</option></select>
+    <select id="t" aria-label="Loại biển"><option value="">Loại biển</option></select>
+    <select id="m" aria-label="Mệnh"><option value="">Ngũ hành của biển</option><option>Kim</option><option>Mộc</option><option>Thủy</option><option>Hỏa</option><option>Thổ</option></select>
+    <select id="n" aria-label="Số nút"><option value="">Số nút</option><option value="9">9 nút</option><option value="8">8 nút</option><option value="7">7 nút</option><option value="10">10 nút</option><option value="6">6 nút trở xuống</option></select>
+    <button class="btn" onclick="apply()">Lọc biển</button>
+  </div>
+  <div class="chips" id="chips"></div>
+</section>
+
+<div id="out"></div>
+
+<section id="phongthuy">
+  <div class="sh"><h2>Xem phong thủy biển số</h2><span>Mang tính tham khảo</span></div>
+  <div class="pt">
+    <div class="panel">
+      <h2>Chấm điểm một biển số</h2>
+      <form class="ip" onsubmit="event.preventDefault();checkPlate()">
+        <input class="f" id="ckIn" placeholder="Nhập biển, ví dụ 35A-568.68">
+        <button class="btn">Xem</button>
+      </form>
+      <div class="res" id="ckRes"></div>
+    </div>
+    <div class="panel">
+      <h2>Tìm biển hợp tuổi</h2>
+      <form class="ip" onsubmit="event.preventDefault();checkYear()">
+        <input class="f" id="yIn" type="number" min="1930" max="2025" placeholder="Năm sinh âm lịch, ví dụ 1990">
+        <button class="btn">Tìm</button>
+      </form>
+      <div class="res" id="yRes"></div>
+    </div>
+  </div>
+</section>
+
+<section id="dichvu">
+  <div class="sh"><h2>Dịch vụ của chúng tôi</h2></div>
+  <div class="pol">
+    <div><span class="ic">✔</span><b>Thông tin minh bạch</b><small>Rõ nguồn gốc biển, rõ tình trạng còn / đã cọc / đã bán.</small></div>
+    <div><span class="ic">⌕</span><b>Tìm biển theo yêu cầu</b><small>Theo tuổi, mệnh, đầu số yêu thích và ngân sách.</small></div>
+    <div><span class="ic">⚖</span><b>Hồ sơ đúng quy định</b><small>Hướng dẫn thủ tục đầy đủ theo pháp luật hiện hành.</small></div>
+    <div><span class="ic">⇄</span><b>Kết nối toàn quốc</b><small>Nhận nhu cầu biển số nhiều tỉnh thành.</small></div>
+  </div>
+  <div class="sh"><h2>Quy trình đấu giá hộ</h2></div>
+  <ol class="steps">
+    <li><b>Tư vấn chọn biển</b>Xác định biển mong muốn, mức giá dự kiến và mệnh hợp tuổi.</li>
+    <li><b>Đăng ký tham gia</b>Hướng dẫn tạo tài khoản, nộp hồ sơ và tiền đặt trước theo quy định.</li>
+    <li><b>Theo sát phiên đấu giá</b>Cùng bạn theo dõi phiên trực tuyến, tư vấn chiến lược trả giá.</li>
+    <li><b>Hoàn tất thủ tục</b>Hướng dẫn nộp tiền trúng đấu giá và đăng ký biển cho xe.</li>
+  </ol>
+</section>
+
+<section id="tin">
+  <div class="sh"><h2>Tin tức &amp; kinh nghiệm</h2></div>
+  <div class="ne" id="posts"></div>
+  <div class="sh"><h2>Câu hỏi thường gặp</h2></div>
+  <details><summary>Số nút của biển được tính thế nào?</summary><p>Cộng tất cả các chữ số trên biển (gồm cả mã tỉnh), lấy chữ số hàng đơn vị. Ví dụ 35A-568.68 → 3+5+5+6+8+6+8 = 41 → 1 nút. Tổng tròn chục được tính là 10 nút. Nhiều người xem 9 nút là cao nhất.</p></details>
+  <details><summary>Ngũ hành của biển dựa vào đâu?</summary><p>Website xét theo chữ số cuối của biển: 1, 6 thuộc Thủy; 2, 7 thuộc Hỏa; 3, 8 thuộc Mộc; 4, 9 thuộc Kim; 5, 0 thuộc Thổ. Biển hợp khi cùng mệnh hoặc tương sinh với mệnh chủ xe.</p></details>
+  <details><summary>Giá biển ghi "Liên hệ" nghĩa là sao?</summary><p>Giá phụ thuộc thời điểm và tình trạng biển. Vui lòng gọi hoặc nhắn Zalo để được báo giá chính xác.</p></details>
+  <details><summary>Website có phải của cơ quan nhà nước không?</summary><p>Không. Đây là website thương mại tư nhân, chỉ cung cấp thông tin và tư vấn. Việc đấu giá, cấp biển do cơ quan có thẩm quyền thực hiện.</p></details>
+</section>
+
+<section class="panel" id="lh" style="margin-top:28px">
+  <h2>Nhận tư vấn miễn phí</h2>
+  <form class="fg" id="lhForm" onsubmit="event.preventDefault();sendLead()">
+    <input class="f" id="lName" placeholder="Họ và tên" required>
+    <input class="f" id="lPhone" placeholder="SĐT / Zalo" required inputmode="tel">
+    <input class="f" id="lNeed" placeholder="Biển số / nhu cầu">
+    <button class="btn">Gửi yêu cầu</button>
+  </form>
+  <p id="lhMsg" style="margin:10px 0 0;color:var(--mut);font-size:14px"></p>
+</section>
+
+</main>
+
+<footer><div class="w">
+  <b>KHO BIỂN SỐ ĐẸP – MAI XUÂN HUY</b>
+  <p><span data-site="khauHieu"></span></p>
+  <p>Chuyên mua bán xe VinFast &amp; biển số đấu giá · <span data-site="khuVuc"></span> · Hotline/Zalo: <span id="hotTxt2"></span></p>
+  <p><a id="lnFb" target="_blank" rel="noopener" style="text-decoration:underline">Facebook</a> · <a id="lnTt" target="_blank" rel="noopener" style="text-decoration:underline">TikTok @mrxuanhuy</a> · <span data-site="tenMien"></span></p>
+  <p class="dis">Website thương mại tư nhân, cung cấp thông tin và kết nối nhu cầu liên quan đến biển số xe theo quy định pháp luật Việt Nam. Không phải cơ quan nhà nước, không đại diện Bộ Công an hay cơ quan đăng ký xe, không thực hiện cấp hoặc phát hành biển số. Thông tin phong thủy mang tính tham khảo. Tình trạng biển có thể thay đổi, vui lòng liên hệ để xác nhận.</p>
+</div></footer>
+
+<div class="fx">
+  <a class="c1" id="fxCall" href="#lh">📞 Gọi ngay</a>
+  <a class="c2" id="fxZalo" href="#lh">Zalo</a>
+  <a class="c3" id="fxMes" href="#lh">Messenger</a>
+</div>
+
+<div class="md" id="md" onclick="if(event.target===this)closeMd()">
+  <div class="mb" role="dialog" aria-modal="true" id="mdBody"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
