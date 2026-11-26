@@ -73,7 +73,7 @@
   });
   var fav = {};
   try { fav = JSON.parse(localStorage.getItem("bsd_fav") || "{}"); } catch (e) { fav = {}; }
-  var state = { p: "", v: "", t: "", m: "", n: "", q: "", onlyFav: false, sort: "", ids: null, label: "" };
+  var state = { p: "", v: "", t: "", m: "", n: "", g: "", q: "", onlyFav: false, sort: "", ids: null, label: "" };
 
   function plateHtml(it, big) {
     var c = "pl" + (it.v === "xemay" ? " xm" : "") + (big ? " big" : "");
@@ -83,7 +83,13 @@
     }
     return '<div class="' + c + '">' + esc(it.pre) + "-" + esc(it.tail) + "</div>";
   }
-  function priceTxt(it) { return it.price ? it.price.toLocaleString("vi-VN") + " đ" : "Giá: Liên hệ"; }
+  function money(v) {
+    if (v >= 1e9) return (Math.round(v / 1e7) / 100).toLocaleString("vi-VN") + " tỷ";
+    if (v >= 1e6) return (Math.round(v / 1e5) / 10).toLocaleString("vi-VN") + " triệu";
+    return v.toLocaleString("vi-VN") + " đ";
+  }
+  function priceTxt(it) { return it.st === "ban" ? "Đã bán" : it.price ? money(it.price) : "Giá: Liên hệ"; }
+  var PRICE_RANGES = { a: [0, 1e8, "Dưới 100 triệu"], b: [1e8, 3e8, "100 – 300 triệu"], c: [3e8, 1e9, "300 triệu – 1 tỷ"], d: [1e9, 1e13, "Trên 1 tỷ"] };
   var ST_TXT = { con: "Còn biển", coc: "Đã cọc", ban: "Đã bán", trung: "Trúng đấu giá" };
   function forSale(it) { return it.st === "con" || it.st === "coc" || it.st === "trung"; }
 
@@ -101,19 +107,21 @@
 
   function section(title, sub, list, withSort) {
     var head = '<div class="sh"><h2>' + title + "</h2><span>" + sub +
-      (withSort ? ' &nbsp;<select class="sort" onchange="setSort(this.value)" aria-label="Sắp xếp"><option value="">Sắp xếp: mặc định</option><option value="nut"' + (state.sort === "nut" ? " selected" : "") + '>Số nút cao trước</option><option value="az"' + (state.sort === "az" ? " selected" : "") + ">Theo đầu biển</option></select>" : "") +
+      (withSort ? ' &nbsp;<select class="sort" onchange="setSort(this.value)" aria-label="Sắp xếp"><option value="">Sắp xếp: mặc định</option><option value="nut"' + (state.sort === "nut" ? " selected" : "") + '>Số nút cao trước</option><option value="az"' + (state.sort === "az" ? " selected" : "") + '>Theo đầu biển</option><option value="giatang"' + (state.sort === "giatang" ? " selected" : "") + '>Giá thấp → cao</option><option value="giagiam"' + (state.sort === "giagiam" ? " selected" : "") + ">Giá cao → thấp</option></select>" : "") +
       "</span></div>";
     if (!list.length) return head + '<div class="empty">Chưa có biển phù hợp. <a href="#lh" style="color:var(--red);font-weight:700">Gửi yêu cầu</a> để được tìm giúp theo tiêu chí.</div>';
     return head + '<div class="gr">' + list.map(card).join("") + "</div>";
   }
 
-  function readForm() { ["p", "v", "t", "m", "n"].forEach(function (k) { state[k] = $(k).value; }); state.q = $("q").value.replace(/\W/g, "").toLowerCase(); }
-  function writeForm() { ["p", "v", "t", "m", "n"].forEach(function (k) { $(k).value = state[k]; }); }
+  function readForm() { ["p", "v", "t", "m", "n", "g"].forEach(function (k) { state[k] = $(k).value; }); state.q = $("q").value.replace(/\W/g, "").toLowerCase(); }
+  function writeForm() { ["p", "v", "t", "m", "n", "g"].forEach(function (k) { $(k).value = state[k]; }); }
+  function byPrice(desc) { return function (a, b) { var x = a.price || (desc ? -1 : 1e15), y = b.price || (desc ? -1 : 1e15); return desc ? y - x : x - y; }; }
 
   function render() {
     var s = state, chips = [];
     if (s.p) chips.push("Mã " + s.p); if (s.v) chips.push(s.v === "oto" ? "Ô tô" : "Xe máy");
     if (s.t) chips.push(s.t); if (s.m) chips.push("Hành " + s.m); if (s.n) chips.push(s.n === "6" ? "≤ 6 nút" : s.n + " nút");
+    if (s.g) chips.push(PRICE_RANGES[s.g][2]);
     if (s.q) chips.push('Tìm "' + $("q").value + '"'); if (s.onlyFav) chips.push("Đã quan tâm"); if (s.ids) chips.push(s.label);
     $("chips").innerHTML = chips.map(function (c) { return '<span class="chip on">' + esc(c) + "</span>"; }).join("") +
       (chips.length ? '<button class="chip" onclick="resetAll()">Xóa lọc ✕</button>' : "");
@@ -122,22 +130,28 @@
     var r = ITEMS.filter(function (it) {
       return (!s.p || it.pre.indexOf(s.p) === 0) && (!s.v || it.v === s.v) && (!s.t || it.tags.indexOf(s.t) > -1) &&
         (!s.m || it.hanh === s.m) && (!s.n || (s.n === "6" ? it.nut <= 6 : it.nut === +s.n)) &&
-        (!s.q || it.key.indexOf(s.q) > -1) && (!s.onlyFav || fav[it.id]) && (!s.ids || s.ids.indexOf(it.id) > -1);
+        (!s.q || it.key.indexOf(s.q) > -1) && (!s.onlyFav || fav[it.id]) && (!s.ids || s.ids.indexOf(it.id) > -1) &&
+        (!s.g || (it.price >= PRICE_RANGES[s.g][0] && it.price < PRICE_RANGES[s.g][1] && it.st !== "ban"));
     });
+    if (s.sort === "giatang") r.sort(byPrice(false));
+    if (s.sort === "giagiam") r.sort(byPrice(true));
     if (s.sort === "nut") r.sort(function (a, b) { return (b.nut === 10 ? 0 : b.nut) - (a.nut === 10 ? 0 : a.nut); });
     if (s.sort === "az") r.sort(function (a, b) { return (a.pre + a.tail).localeCompare(b.pre + b.tail); });
 
     var h;
     if (!chips.length) {
       var avail = r.filter(forSale);
-      var vip = avail.filter(function (it) { return it.v === "oto" && /Ngũ quý|Tứ quý|Thần tài|Phát lộc|Sảnh tiến/.test(it.tags.join()); }).slice(0, 8);
+      var vip = avail.filter(function (it) { return it.v === "oto" && /Ngũ quý|Tứ quý/.test(it.tags.join()); }).sort(byPrice(true)).slice(0, 8);
+      if (vip.length < 4) vip = avail.filter(function (it) { return it.v === "oto" && /Ngũ quý|Tứ quý|Thần tài|Phát lộc|Sảnh tiến/.test(it.tags.join()); }).sort(byPrice(true)).slice(0, 8);
       var won = avail.filter(function (it) { return it.st === "trung" && vip.indexOf(it) < 0; });
-      var nb = avail.filter(function (it) { return it.pre.indexOf("35") === 0 && it.st !== "trung" && vip.indexOf(it) < 0; });
-      var xm = avail.filter(function (it) { return it.v === "xemay"; });
-      h = (vip.length ? section("Biển số VIP nổi bật", "Ngũ quý · Tứ quý · Thần tài · Phát lộc", vip) : "") +
+      var oto = avail.filter(function (it) { return it.v === "oto" && it.st !== "trung" && vip.indexOf(it) < 0; });
+      var xm = avail.filter(function (it) { return it.v === "xemay"; }).sort(byPrice(true));
+      var sold = r.filter(function (it) { return it.st === "ban"; });
+      h = (vip.length ? section("Biển số VIP nổi bật", "Ngũ quý · Tứ quý", vip) : "") +
+        (oto.length ? section("Biển ô tô đang bán", oto.length + " biển", oto) : "") +
+        (xm.length ? '<div id="xemay">' + section("Biển số xe máy", xm.length + " biển", xm) + "</div>" : "") +
         (won.length ? '<div id="trung">' + section("Biển trúng đấu giá đang chào bán", won.length + " biển · bước giá 5.000.000", won) + "</div>" : "") +
-        (nb.length ? section("Biển số Ninh Bình khác", "Mã 35 · " + nb.length + " biển", nb) : "") +
-        (xm.length ? section("Biển số xe máy", "Xe máy", xm) : "");
+        (sold.length ? section("Biển đã bán gần đây", sold.length + " biển · cảm ơn quý khách", sold) : "");
     } else {
       h = section("Kết quả tìm kiếm", r.length + " biển", r, true);
     }
@@ -148,7 +162,7 @@
   window.apply = function () { readForm(); state.ids = null; render(); };
   window.doSearch = function () { readForm(); state.ids = null; render(); go("out"); };
   window.setSort = function (v) { state.sort = v; render(); };
-  window.resetAll = function () { state = { p: "", v: "", t: "", m: "", n: "", q: "", onlyFav: false, sort: "", ids: null, label: "" }; writeForm(); $("q").value = ""; render(); };
+  window.resetAll = function () { state = { p: "", v: "", t: "", m: "", n: "", g: "", q: "", onlyFav: false, sort: "", ids: null, label: "" }; writeForm(); $("q").value = ""; render(); };
   window.quick = function (o) { window.resetAll(); for (var k in o) state[k] = o[k]; writeForm(); render(); };
   window.toggleFavView = function () { state.onlyFav = !state.onlyFav; render(); go("kho"); };
   window.toggleFav = function (id) {

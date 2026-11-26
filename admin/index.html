@@ -322,7 +322,7 @@ label{font-size:13px;color:var(--mut);display:block;margin-bottom:4px}
       ln = ln.trim(); if (!ln) return;
       var m = ln.toUpperCase().match(/^(\d{2}[A-Z]{1,2}\d?)\s*[-\s]\s*([\d.]{4,6})(?:\s+([\d.,]+))?/);
       if (!m) { bad.push(ln); return; }
-      var p = [m[1], normTail(m[2]), /^\d{2}[A-Z]\d$/.test(m[1]) ? "xemay" : "oto", m[3] ? +m[3].replace(/\D/g, "") : 0, st];
+      var p = [m[1], normTail(m[2]), /^\d{2}([A-Z]\d|[A-Z]{2})$/.test(m[1]) ? "xemay" : "oto", m[3] ? +m[3].replace(/\D/g, "") : 0, st];
       if (!validPlate(p)) { bad.push(ln); return; }
       if (have[p[0] + "-" + p[1]]) { dup++; return; }
       have[p[0] + "-" + p[1]] = 1; data.PLATES.push(p); added++;
