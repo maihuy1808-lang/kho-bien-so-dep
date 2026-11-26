@@ -176,7 +176,7 @@
       if (auto) vip = avail.filter(function (it) { return it.v === "oto" && /Ngũ quý|Tứ quý/.test(it.tags.join()); }).sort(byPrice(true)).slice(0, 8);
       var saleL = avail.filter(function (it) { return it.sale && vip.indexOf(it) < 0; }).sort(function (a, b) { return b.pct - a.pct; });
       var taken = function (it) { return vip.indexOf(it) > -1 || saleL.indexOf(it) > -1; };
-      var won = avail.filter(function (it) { return it.st === "trung" && !taken(it); });
+      var won = avail.filter(function (it) { return it.st === "trung" && it.v === "oto" && !taken(it); });
       var oto = avail.filter(function (it) { return it.v === "oto" && it.st !== "trung" && !taken(it); });
       var xm = avail.filter(function (it) { return it.v === "xemay" && !taken(it); }).sort(byPrice(true));
       var sold = r.filter(function (it) { return it.st === "ban"; });
