@@ -227,6 +227,7 @@
       (it.date ? "<dt>Ngày đăng</dt><dd>" + fmtDate(it.date) + (it.age <= 0 ? " (hôm nay)" : it.age < 9999 ? " (" + it.age + " ngày trước)" : "") + "</dd>" : "") +
       '<dt>Giá</dt><dd style="color:var(--red)">' + priceHtml(it) + "</dd></dl>" +
       meaningHtml(it.mean) +
+      (videoOfPlate(it) ? '<div class="mvid"><iframe src="' + ttPlayer(videoOfPlate(it).id) + '" title="Video biển ' + esc(full) + '" allow="fullscreen; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>' : "") +
       '<div class="row"><a class="btn" href="' + c.tel + '" onclick="return needContact(\'' + c.tel + '\')">📞 Gọi tư vấn</a>' +
       '<a class="btn" style="background:#0068ff" href="' + c.zalo + '" target="_blank" rel="noopener" onclick="copyTxt(\'Tôi quan tâm biển ' + full + '\');return needContact(\'' + c.zalo + '\')">Nhắn Zalo</a></div>' +
       '<div class="row" style="margin-top:8px"><button class="btn ghost" onclick="toggleFav(' + id + ')">' + (fav[id] ? "♥ Bỏ quan tâm" : "♡ Quan tâm") + '</button>' +
@@ -288,6 +289,44 @@
     state.sort = "nut"; render(); go("out");
   };
 
+  /* ---------- Bảng tin: video TikTok ---------- */
+  var VIDS = (typeof VIDEOS !== "undefined" ? VIDEOS : []).filter(function (v) { return /^\d{8,25}$/.test(String(v.id)); });
+  var TT_USER = "mrxuanhuy";
+  var vShown = 6;
+  function ttUrl(id) { return "https://www.tiktok.com/@" + TT_USER + "/video/" + id; }
+  function ttPlayer(id) { return "https://www.tiktok.com/player/v1/" + id + "?music_info=0&description=1&rel=0&native_context_menu=0&closed_caption=0"; }
+  function plateKey(s) { return String(s || "").toUpperCase().replace(/[^0-9A-Z]/g, ""); }
+  function videoCard(v) {
+    var it = v.b ? ITEMS.filter(function (x) { return plateKey(x.pre + x.tail) === plateKey(v.b); })[0] : null;
+    return '<article class="vc"><div class="vf"><iframe src="' + ttPlayer(v.id) + '" loading="lazy" title="' + esc(v.t || "Video TikTok") + '" allow="fullscreen; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>' +
+      '<div class="vb"><b class="vt">' + esc(v.t || "Video TikTok") + "</b>" +
+      '<div class="vm">' + (v.d ? fmtDate(v.d) : "") + (it ? (v.d ? " · " : "") + '<a href="javascript:void(0)" onclick="openPlate(' + it.id + ')">Xem biển ' + esc(it.pre + "-" + it.tail) + "</a>" : "") + "</div>" +
+      '<div class="va"><a href="' + ttUrl(v.id) + '" target="_blank" rel="noopener">Mở trên TikTok ↗</a><button type="button" onclick="shareVideo(\'' + v.id + '\')">Chia sẻ</button></div></div></article>';
+  }
+  function renderVideos() {
+    var g = $("vgrid"); if (!g) return;
+    if (!VIDS.length) { g.innerHTML = '<p class="vload">Chưa có video. Xem kênh TikTok bên dưới.</p>'; return; }
+    g.innerHTML = VIDS.slice(0, vShown).map(videoCard).join("");
+    $("vmoreBtn").hidden = vShown >= VIDS.length;
+  }
+  window.moreVideos = function () { vShown += 6; renderVideos(); };
+  window.shareVideo = function (id) {
+    var u = ttUrl(id);
+    if (navigator.share) { navigator.share({ title: "Video biển số đẹp – Mr Xuân Huy", url: u }).catch(function () {}); }
+    else window.copyTxt(u);
+  };
+  // Khung kênh TikTok (tự cập nhật video mới) – chỉ tải khi khách cuộn tới
+  function loadCreator() {
+    var box = $("ttCreator"); if (!box || box.getAttribute("data-on")) return;
+    box.setAttribute("data-on", "1");
+    box.innerHTML = '<blockquote class="tiktok-embed" cite="https://www.tiktok.com/@' + TT_USER + '" data-unique-id="' + TT_USER + '" data-embed-type="creator" style="max-width:780px;min-width:288px;margin:0 auto"><section><a target="_blank" rel="noopener" href="https://www.tiktok.com/@' + TT_USER + '">@' + TT_USER + "</a></section></blockquote>";
+    var s = document.createElement("script"); s.src = "https://www.tiktok.com/embed.js"; s.async = true; document.body.appendChild(s);
+  }
+  function videoOfPlate(it) {
+    var k = plateKey(it.pre + it.tail);
+    return VIDS.filter(function (v) { return v.b && plateKey(v.b) === k; })[0];
+  }
+
   /* ---------- Form liên hệ ---------- */
   window.sendLead = function () {
     var msg = "Tư vấn biển số: " + $("lName").value + " – " + $("lPhone").value + ($("lNeed").value ? " – " + $("lNeed").value : "");
@@ -336,6 +375,11 @@
     });
     document.addEventListener("click", function () { closeDD(); });
     document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeDD(); });
+    renderVideos();
+    var bt = $("bangtin");
+    if (bt && "IntersectionObserver" in window) {
+      new IntersectionObserver(function (en, ob) { if (en[0].isIntersecting) { loadCreator(); ob.disconnect(); } }, { rootMargin: "400px" }).observe(bt);
+    } else loadCreator();
     updFav(); render();
   }
   init();

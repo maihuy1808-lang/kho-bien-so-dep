@@ -59,6 +59,13 @@ label{font-size:13px;color:var(--mut);display:block;margin-bottom:4px}
 .noterow td{background:var(--bg)}
 .noterow input{margin:4px 0}
 .hint{font-size:12.5px;color:var(--mut)}
+.vrow{display:flex;gap:14px;border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:10px;align-items:flex-start}
+.vthumb{width:110px;flex:none;aspect-ratio:9/16;background:#000;border-radius:8px;overflow:hidden;position:relative}
+.vthumb iframe{position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none}
+.vfields{flex:1;min-width:0;display:grid;gap:8px}
+.vbtns{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.vbtns a{font-weight:700;font-size:13px;margin-right:auto}
+@media(max-width:640px){.vrow{flex-direction:column}.vthumb{width:100%;max-width:200px}}
 .tbl tr.chg td{background:var(--warnbg)}
 .tbl tr.bad input.tail,.tbl tr.bad input.pre{border-color:var(--red)}
 .scroll{overflow-x:auto}
@@ -111,6 +118,7 @@ label{font-size:13px;color:var(--mut);display:block;margin-bottom:4px}
     <button class="tab on" data-t="plates" onclick="tab('plates')">Biển số</button>
     <button class="tab" data-t="add" onclick="tab('add')">Thêm nhiều biển</button>
     <button class="tab" data-t="info" onclick="tab('info')">Thông tin liên hệ</button>
+    <button class="tab" data-t="videos" onclick="tab('videos')">Video TikTok</button>
     <button class="tab" data-t="posts" onclick="tab('posts')">Bài viết</button>
   </div>
 
@@ -143,6 +151,17 @@ label{font-size:13px;color:var(--mut);display:block;margin-bottom:4px}
     <div class="g2" id="infoForm"></div>
   </div>
 
+  <div class="card pane" id="p-videos" style="margin-top:0">
+    <h2>Video TikTok trên Bảng tin</h2>
+    <p style="margin-top:0;color:var(--mut);font-size:14px">Đăng video lên TikTok xong, bấm <b>Chia sẻ → Sao chép liên kết</b> trong TikTok, rồi dán vào ô dưới. Video mới thêm sẽ nằm trên cùng. Khung "Kênh TikTok" trên web tự cập nhật, không cần làm gì.</p>
+    <div class="bar">
+      <input id="vIn" placeholder="Dán link TikTok, vd https://www.tiktok.com/@mrxuanhuy/video/77…" style="max-width:none;flex:1" aria-label="Link video TikTok">
+      <button class="btn sm" onclick="addVideo()">+ Thêm video</button>
+    </div>
+    <div class="msg" id="vMsg"></div>
+    <div id="vList"></div>
+  </div>
+
   <div class="card pane" id="p-posts" style="margin-top:0">
     <h2>Bài viết (Tin tức &amp; kinh nghiệm)</h2>
     <div id="postList"></div>
@@ -157,7 +176,7 @@ label{font-size:13px;color:var(--mut);display:block;margin-bottom:4px}
   <span id="saveInfo">Chưa có thay đổi.</span>
 </div></div>
 
-<script src="../meaning.js?v=20261126e"></script>
+<script src="../meaning.js?v=20261126g"></script>
 <script>
 (function () {
   "use strict";
@@ -189,7 +208,7 @@ label{font-size:13px;color:var(--mut);display:block;margin-bottom:4px}
     });
   }
   function parseData(text) {
-    var f = new Function(text + "\n;return {SITE: typeof SITE!=='undefined'?SITE:{}, PLATES: typeof PLATES!=='undefined'?PLATES:[], PROVINCES: typeof PROVINCES!=='undefined'?PROVINCES:[], POSTS: typeof POSTS!=='undefined'?POSTS:[]};");
+    var f = new Function(text + "\n;return {SITE: typeof SITE!=='undefined'?SITE:{}, PLATES: typeof PLATES!=='undefined'?PLATES:[], PROVINCES: typeof PROVINCES!=='undefined'?PROVINCES:[], POSTS: typeof POSTS!=='undefined'?POSTS:[], VIDEOS: typeof VIDEOS!=='undefined'?VIDEOS:[]};");
     return f();
   }
   function normTail(t) {
@@ -231,6 +250,14 @@ label{font-size:13px;color:var(--mut);display:block;margin-bottom:4px}
     L.push("/* Bài viết */");
     L.push("var POSTS = [");
     d.POSTS.forEach(function (p, i) { L.push("  { t: " + q(p.t) + ", d: " + q(p.d) + ", tag: " + q(p.tag) + " }" + (i < d.POSTS.length - 1 ? "," : "")); });
+    L.push("];", "");
+    L.push("/* ---------------------------------------------------------");
+    L.push("   BẢNG TIN – VIDEO TIKTOK (@mrxuanhuy)");
+    L.push("   Mỗi video: { id: số video TikTok, t: tiêu đề ngắn, d: ngày đăng, b: biển số liên quan (nếu có) }");
+    L.push("   Thêm/xóa ở trang /admin → tab \"Video TikTok\". Video mới nhất để trên cùng.");
+    L.push("   --------------------------------------------------------- */");
+    L.push("var VIDEOS = [");
+    (d.VIDEOS || []).forEach(function (v, i) { L.push("  { id: " + q(v.id) + ", t: " + q(v.t) + ", d: " + q(v.d) + ", b: " + q(v.b) + " }" + (i < d.VIDEOS.length - 1 ? "," : "")); });
     L.push("];", "");
     return L.join("\n");
   }
@@ -286,7 +313,37 @@ label{font-size:13px;color:var(--mut);display:block;margin-bottom:4px}
   };
 
   /* ---------- vẽ giao diện ---------- */
-  function drawAll() { drawPlates(); drawInfo(); drawPosts(); }
+  function drawAll() { drawPlates(); drawInfo(); drawPosts(); drawVideos(); }
+
+  /* ---------- Video TikTok ---------- */
+  function vid(link) {
+    var s = String(link || "").trim(), m = s.match(/\/video\/(\d{8,25})/) || s.match(/^(\d{8,25})$/);
+    return m ? m[1] : "";
+  }
+  function drawVideos() {
+    var V = data.VIDEOS || (data.VIDEOS = []);
+    $("vList").innerHTML = V.length ? V.map(function (v, i) {
+      return '<div class="vrow"><div class="vthumb"><iframe src="https://www.tiktok.com/player/v1/' + esc(v.id) + '?music_info=0&description=0&controls=0" loading="lazy" title="Xem trước video"></iframe></div>' +
+        '<div class="vfields"><div class="g2"><div><label>Tiêu đề hiện trên web</label><input value="' + esc(v.t) + '" oninput="setV(' + i + ',\'t\',this.value)" placeholder="vd Biển 35A-999.29 – Tam hoa cửu"></div>' +
+        '<div><label>Ngày đăng</label><input type="date" value="' + esc(v.d) + '" onchange="setV(' + i + ',\'d\',this.value)"></div>' +
+        '<div><label>Biển số trong video (để khách bấm xem biển)</label><input value="' + esc(v.b) + '" onchange="setV(' + i + ',\'b\',this.value.toUpperCase().trim())" placeholder="vd 35A-999.29 (không bắt buộc)"></div></div>' +
+        '<div class="vbtns"><a href="https://www.tiktok.com/@mrxuanhuy/video/' + esc(v.id) + '" target="_blank" rel="noopener">Mở trên TikTok ↗</a>' +
+        '<button class="btn ghost sm" onclick="moveV(' + i + ',-1)"' + (i ? "" : " disabled") + '>↑ Lên</button><button class="btn ghost sm" onclick="moveV(' + i + ',1)"' + (i < V.length - 1 ? "" : " disabled") + '>↓ Xuống</button>' +
+        '<button class="btn ghost sm" onclick="delV(' + i + ')">Xóa</button></div></div></div>';
+    }).join("") : '<p style="color:var(--mut)">Chưa có video nào.</p>';
+  }
+  window.addVideo = function () {
+    var id = vid($("vIn").value);
+    if (!id) { msg("vMsg", "err", "Link chưa đúng. Link video TikTok có dạng <b>https://www.tiktok.com/@mrxuanhuy/video/7712…</b>. Nếu anh chép link rút gọn (vm.tiktok.com), hãy mở link đó trên trình duyệt rồi chép lại địa chỉ đầy đủ."); return; }
+    if ((data.VIDEOS || []).some(function (v) { return v.id === id; })) { msg("vMsg", "warn", "Video này đã có trong danh sách."); return; }
+    var t = new Date(), d = t.getFullYear() + "-" + String(t.getMonth() + 1).padStart(2, "0") + "-" + String(t.getDate()).padStart(2, "0");
+    data.VIDEOS.unshift({ id: id, t: "", d: d, b: "" });
+    $("vIn").value = ""; drawVideos(); markDirty();
+    msg("vMsg", "ok", "Đã thêm video. Anh điền tiêu đề rồi bấm <b>Lưu lên website</b>.");
+  };
+  window.setV = function (i, k, v) { data.VIDEOS[i][k] = String(v).replace(/"/g, "'"); markDirty(); };
+  window.moveV = function (i, dir) { var V = data.VIDEOS, j = i + dir; if (j < 0 || j >= V.length) return; var x = V[i]; V[i] = V[j]; V[j] = x; drawVideos(); markDirty(); };
+  window.delV = function (i) { if (!window.confirm("Xóa video này khỏi Bảng tin? (Video trên TikTok không bị ảnh hưởng)")) return; data.VIDEOS.splice(i, 1); drawVideos(); markDirty(); };
   window.tab = function (t) {
     document.querySelectorAll(".tab").forEach(function (b) { b.classList.toggle("on", b.getAttribute("data-t") === t); });
     document.querySelectorAll(".pane").forEach(function (p) { p.classList.toggle("on", p.id === "p-" + t); });
