@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Kho Biển Số Đẹp – Mai Xuân Huy · Ninh Bình</title>
 <meta name="description" content="Kho biển số đẹp ô tô, xe máy: ngũ quý, tứ quý, thần tài, phát lộc. Tra cứu biển hợp mệnh, tư vấn đấu giá hộ tại Ninh Bình.">
-<link rel="stylesheet" href="style.css?v=20261126d">
+<link rel="stylesheet" href="style.css?v=20261126e">
 </head>
 <body>
 
@@ -23,22 +23,40 @@
     </form>
     <button class="fav" id="favBtn" onclick="toggleFavView()">♡ Quan tâm<b id="fc">0</b></button>
   </div>
-  <nav><div class="w">
-    <a href="#kho" onclick="quick({})">Tất cả biển</a>
-    <a href="#kho" onclick="quick({hot:1})">🔥 Nổi bật</a>
-    <a href="#kho" data-sale onclick="quick({sale:1})">Giảm giá</a>
-    <a href="#kho" data-t="Ngũ quý" onclick="quick({t:'Ngũ quý'})">Ngũ quý</a>
-    <a href="#kho" data-t="Tứ quý" onclick="quick({t:'Tứ quý'})">Tứ quý</a>
-    <a href="#kho" data-t="Thần tài" onclick="quick({t:'Thần tài'})">Thần tài</a>
-    <a href="#kho" data-t="Phát lộc" onclick="quick({t:'Phát lộc'})">Phát lộc</a>
-    <a href="#kho" data-t="Tam hoa" onclick="quick({t:'Tam hoa'})">Tam hoa</a>
-    <a href="#kho" data-v="xemay" onclick="quick({v:'xemay'})">Biển xe máy</a>
-    <a href="#kho" onclick="quick({p:'35'})">Biển Ninh Bình</a>
-    <a href="#phongthuy">Xem phong thủy</a>
-    <a href="#trung" onclick="quick({})">Biển trúng đấu giá</a>
-    <a href="#dichvu">Đấu giá hộ</a>
-    <a href="#tin">Tin tức</a>
-    <a href="#lh">Liên hệ</a>
+  <nav><div class="w nv">
+    <div class="dd">
+      <button class="ddb" type="button" aria-expanded="false" aria-haspopup="true">Kho biển <span aria-hidden="true">▾</span></button>
+      <div class="ddm">
+        <a href="#kho" onclick="quick({})">Tất cả biển</a>
+        <a href="#kho" data-v="oto" onclick="quick({v:'oto'})">Biển ô tô</a>
+        <a href="#kho" data-v="xemay" onclick="quick({v:'xemay'})">Biển xe máy</a>
+        <a href="#kho" onclick="quick({p:'35'})">Biển Ninh Bình</a>
+        <a href="#trung" onclick="quick({})">Biển trúng đấu giá</a>
+        <a href="#kho" data-sale onclick="quick({sale:1})">Đang giảm giá</a>
+      </div>
+    </div>
+    <div class="dd">
+      <button class="ddb" type="button" aria-expanded="false" aria-haspopup="true">Loại biển <span aria-hidden="true">▾</span></button>
+      <div class="ddm">
+        <a href="#kho" data-t="Ngũ quý" onclick="quick({t:'Ngũ quý'})">Ngũ quý</a>
+        <a href="#kho" data-t="Tứ quý" onclick="quick({t:'Tứ quý'})">Tứ quý</a>
+        <a href="#kho" data-t="Tam hoa" onclick="quick({t:'Tam hoa'})">Tam hoa</a>
+        <a href="#kho" data-t="Thần tài" onclick="quick({t:'Thần tài'})">Thần tài</a>
+        <a href="#kho" data-t="Ông địa" onclick="quick({t:'Ông địa'})">Ông địa</a>
+        <a href="#kho" data-t="Phát lộc" onclick="quick({t:'Phát lộc'})">Phát lộc</a>
+        <a href="#kho" data-t="Sảnh tiến" onclick="quick({t:'Sảnh tiến'})">Sảnh tiến</a>
+      </div>
+    </div>
+    <a class="nvl" href="#phongthuy">Phong thủy</a>
+    <div class="dd">
+      <button class="ddb" type="button" aria-expanded="false" aria-haspopup="true">Dịch vụ <span aria-hidden="true">▾</span></button>
+      <div class="ddm">
+        <a href="#dichvu">Đấu giá hộ</a>
+        <a href="#tin">Tin tức &amp; kinh nghiệm</a>
+        <a href="#faq">Câu hỏi thường gặp</a>
+      </div>
+    </div>
+    <a class="nvl" href="#lh">Liên hệ</a>
   </div></nav>
 </header>
 
@@ -114,7 +132,7 @@
 <section id="tin">
   <div class="sh"><h2>Tin tức &amp; kinh nghiệm</h2></div>
   <div class="ne" id="posts"></div>
-  <div class="sh"><h2>Câu hỏi thường gặp</h2></div>
+  <div class="sh" id="faq"><h2>Câu hỏi thường gặp</h2></div>
   <details><summary>Số nút của biển được tính thế nào?</summary><p>Cộng tất cả các chữ số trên biển (gồm cả mã tỉnh), lấy chữ số hàng đơn vị. Ví dụ 35A-568.68 → 3+5+5+6+8+6+8 = 41 → 1 nút. Tổng tròn chục được tính là 10 nút. Nhiều người xem 9 nút là cao nhất.</p></details>
   <details><summary>Ngũ hành của biển dựa vào đâu?</summary><p>Website xét theo chữ số cuối của biển: 1, 6 thuộc Thủy; 2, 7 thuộc Hỏa; 3, 8 thuộc Mộc; 4, 9 thuộc Kim; 5, 0 thuộc Thổ. Biển hợp khi cùng mệnh hoặc tương sinh với mệnh chủ xe.</p></details>
   <details><summary>Giá biển ghi "Liên hệ" nghĩa là sao?</summary><p>Giá phụ thuộc thời điểm và tình trạng biển. Vui lòng gọi hoặc nhắn Zalo để được báo giá chính xác.</p></details>
@@ -154,7 +172,7 @@
 <div class="toast" id="toast"></div>
 
 <script>document.write('<script src="data.js?v=' + Math.floor(Date.now() / 60000) + '"><\/script>');</script>
-<script src="meaning.js?v=20261126d"></script>
-<script src="app.js?v=20261126d"></script>
+<script src="meaning.js?v=20261126e"></script>
+<script src="app.js?v=20261126e"></script>
 </body>
 </html>

@@ -94,7 +94,69 @@
   function pal(s) { return s.length > 2 && s === s.split("").reverse().join(""); }
   function fill(t, d) { return t.replace(/\{d\}/g, TEN_SO[d]).replace(/\{y\}/g, Y_NGHIA[d]); }
 
+  /* ---------- Đọc liền cả dãy số ---------- */
+  var CHU = { "0": "viên", "1": "nhất", "2": "mãi", "3": "tài", "4": "tứ", "5": "phúc", "6": "lộc", "7": "thất", "8": "phát", "9": "cửu" };
+  var DEM = ["", "", "song", "tam", "tứ quý", "ngũ"];
+  var Y_CAU = {
+    "6": "tài lộc dồi dào", "8": "làm ăn phát đạt", "9": "bền vững trường cửu", "3": "tiền tài sung túc",
+    "2": "mãi mãi bền lâu", "1": "khởi đầu suôn sẻ", "5": "phúc đức đủ đầy", "4": "bốn mùa bình an",
+    "7": "vững chắc an toàn", "0": "viên mãn tròn đầy"
+  };
+  var CAP_CUOI = { "39": "thần tài nhỏ", "79": "thần tài lớn", "38": "ông địa nhỏ", "78": "ông địa lớn" };
+  function hoa(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+  // Tách dãy thành từng cụm: cụm số có tên (≥4 số), thần tài/ông địa ở cuối, hoặc các số giống nhau liền nhau
+  function docDay(d, atEnd) {
+    if (!d) return [];
+    // Cụm số có tên (≥4 số, không phải toàn một số) ở bất kỳ vị trí nào – lấy cụm dài nhất
+    var best = null;
+    for (var k = 0; k < CUM_SO.length; k++) {
+      var c = CUM_SO[k][0];
+      if (c.length < 4 || same(c)) continue;
+      var at = d.indexOf(c);
+      if (at > -1 && (!best || c.length > best.c.length)) best = { at: at, c: c, name: CUM_SO[k][1] };
+    }
+    if (best) return docDay(d.slice(0, best.at), false).concat([best.name.toLowerCase()], docDay(d.slice(best.at + best.c.length), atEnd));
+    // Còn lại: thần tài / ông địa ở cuối biển, hoặc gom các số giống nhau (song, tam, tứ, ngũ)
+    var parts = [], i = 0;
+    while (i < d.length) {
+      if (atEnd && i === d.length - 2 && CAP_CUOI[d.slice(-2)]) { parts.push(CAP_CUOI[d.slice(-2)]); i += 2; continue; }
+      var j = i; while (j < d.length && d[j] === d[i]) j++;
+      var n = j - i;
+      parts.push(n === 1 ? CHU[d[i]] : DEM[Math.min(n, 5)] + " " + CHU[d[i]]);
+      i = j;
+    }
+    return parts;
+  }
+  function giaiNghia(d) {
+    var y = [], seen = {};
+    if (d.length >= 5 && same(d.slice(-5))) y.push("biển ngũ quý hiếm có");
+    else if (same(d.slice(-4))) y.push("biển tứ quý sang trọng");
+    if (d.indexOf("1102") > -1) y.push("độc nhất vô nhị");
+    if (seq(d.slice(-4))) y.push("từng bước thăng tiến");
+    if (/(39|79)$/.test(d)) y.push("thần tài gõ cửa");
+    if (/(38|78)$/.test(d)) y.push("ông địa phù hộ");
+    // ưu tiên số xuất hiện nhiều, rồi theo thứ tự trong dãy
+    var cnt = {}; d.split("").forEach(function (c) { cnt[c] = (cnt[c] || 0) + 1; });
+    var order = Object.keys(cnt).sort(function (a, b) { return cnt[b] - cnt[a] || d.indexOf(a) - d.indexOf(b); });
+    order.forEach(function (c) { if (y.length < 3 && !seen[c]) { seen[c] = 1; y.push(Y_CAU[c]); } });
+    return y.join(", ");
+  }
+  function chonTho(d) { var r = cu(d); return r ? r.verse : THO.chung; }
+
   function PlateMeaning(tail) {
+    var d = digits(tail);
+    if (d.length < 2) return null;
+    var parts = docDay(d, true);
+    return {
+      title: hoa(parts.join(" ")),          // đọc liền cả dãy, vd "Tam lộc phát lộc"
+      sense: hoa(giaiNghia(d)),             // giải nghĩa, vd "Tài lộc dồi dào, làm ăn phát đạt"
+      verse: chonTho(d),
+      reading: d.split("").map(function (c) { return c + " " + SO[c]; }).join(" · ")
+    };
+  }
+
+  // Bộ chọn câu thơ (giữ cách nhận diện cũ)
+  function cu(tail) {
     var d = digits(tail);
     if (d.length < 2) return null;
     var L = d.length, last4 = d.slice(-4), last5 = d.slice(-5);

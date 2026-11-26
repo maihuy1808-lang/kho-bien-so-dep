@@ -123,7 +123,7 @@
       (badges ? '<div class="bds">' + badges + "</div>" : "") +
       plateHtml(it) +
       '<div class="tags">' + tg + "</div>" +
-      (it.mean ? '<div class="mean" title="' + esc(it.mean.verse || "") + '">“' + esc(it.mean.title) + '”</div>' : "") +
+      (it.mean ? '<div class="mean" title="' + esc(it.mean.verse || "") + '"><b>' + esc(it.mean.title) + "</b>" + (it.mean.sense ? " – " + esc(it.mean.sense.toLowerCase()) : "") + "</div>" : "") +
       '<div class="mt"><span>' + it.nut + " nút · " + mx(it.hanh) + '</span><span>' + (it.v === "xemay" ? "Xe máy" : "Ô tô") + "</span></div>" +
       '<div class="pr">' + priceHtml(it) + "</div>" +
       '<div class="row"><button class="a" onclick="event.stopPropagation();openPlate(' + it.id + ')">Chi tiết</button>' +
@@ -235,7 +235,8 @@
   };
   function meaningHtml(m) {
     if (!m) return "";
-    return '<div class="ynghia"><b>Ý nghĩa biển số</b><p class="yt">“' + esc(m.title) + '”</p>' +
+    return '<div class="ynghia"><b>Ý nghĩa biển số</b><p class="yt">' + esc(m.title) + "</p>" +
+      (m.sense ? '<p class="ys">' + esc(m.sense) + "</p>" : "") +
       (m.verse ? '<p class="tho">' + esc(m.verse).split(" / ").join("<br>") + "</p>" : "") +
       (m.reading ? '<p class="doc">Đọc từng số: ' + esc(m.reading) + "</p>" : "") + "</div>";
   }
@@ -325,6 +326,16 @@
       var n = ITEMS.filter(function (it) { return forSale(it) && (!t || it.tags.indexOf(t) > -1) && (!v || it.v === v) && (!sl || it.sale); }).length;
       a.hidden = n === 0;
     });
+    // Menu xổ xuống: bấm để mở/đóng (điện thoại), bấm ra ngoài hoặc chọn mục thì đóng
+    var dds = document.querySelectorAll("nav .dd");
+    function closeDD(except) { dds.forEach(function (d) { if (d !== except) { d.classList.remove("open"); d.querySelector(".ddb").setAttribute("aria-expanded", "false"); } }); }
+    dds.forEach(function (d) {
+      var b = d.querySelector(".ddb");
+      b.addEventListener("click", function (e) { e.stopPropagation(); var o = !d.classList.contains("open"); closeDD(d); d.classList.toggle("open", o); b.setAttribute("aria-expanded", String(o)); });
+      d.querySelectorAll(".ddm a").forEach(function (a) { a.addEventListener("click", function () { closeDD(); if (document.activeElement) document.activeElement.blur(); }); });
+    });
+    document.addEventListener("click", function () { closeDD(); });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeDD(); });
     updFav(); render();
   }
   init();
