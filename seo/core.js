@@ -241,7 +241,7 @@
       '<meta property="og:url" content="' + BASE + o.path + '">\n' +
       '<meta property="og:title" content="' + esc(o.title) + '">\n' +
       '<meta property="og:description" content="' + esc(o.desc) + '">\n' +
-      '<meta property="og:image" content="' + BASE + '/og-mr-xuan-huy-2.jpg">\n' +
+      '<meta property="og:image" content="' + BASE + (o.ogImage || "/og-mr-xuan-huy-2.jpg") + '">\n' +
       '<meta property="og:image:width" content="1200">\n<meta property="og:image:height" content="630">\n' +
       '<meta property="og:locale" content="vi_VN">\n<meta name="twitter:card" content="summary_large_image">\n' +
       '<meta name="theme-color" content="#12233f">\n' +
@@ -269,6 +269,43 @@
     if (it.st === "ban") return "Đã bán";
     if (!it.price) return "Giá: Liên hệ";
     return (it.old > it.price ? '<s class="old">' + money(it.old) + "</s> " : "") + money(it.price);
+  }
+  /* ---- Ảnh chia sẻ riêng từng biển (SVG → PNG 1200x630 trong GitHub Actions) ---- */
+  function hashStr(s) { var h = 5381; for (var i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) >>> 0; return h.toString(36); }
+  function ogSvg(it, SITE) {
+    var F = "Roboto, 'DejaVu Sans', Arial, sans-serif";
+    var xm = it.v === "xemay";
+    var m = it.mean, title = m && m.title ? m.title : (it.tags[0] || "Biển số đẹp");
+    var tSize = title.length > 34 ? 40 : title.length > 24 ? 48 : 56;
+    var plate = xm
+      ? '<rect x="420" y="108" width="360" height="228" rx="22" fill="#fff" stroke="#111" stroke-width="10"/>' +
+        '<text x="600" y="198" text-anchor="middle" font-family="' + F + '" font-weight="700" font-size="84" fill="#111">' + esc(it.pre.slice(0, 2) + "-" + it.pre.slice(2)) + "</text>" +
+        '<text x="600" y="310" text-anchor="middle" font-family="' + F + '" font-weight="700" font-size="92" fill="#111" textLength="300" lengthAdjust="spacingAndGlyphs">' + esc(it.tail) + "</text>"
+      : '<rect x="170" y="118" width="860" height="180" rx="22" fill="#fff" stroke="#111" stroke-width="10"/>' +
+        '<text x="600" y="252" text-anchor="middle" font-family="' + F + '" font-weight="700" font-size="128" fill="#111" textLength="780" lengthAdjust="spacingAndGlyphs">' + esc(it.label) + "</text>";
+    var pY = xm ? 395 : 377;
+    var priceTxt = it.st === "ban" ? "ĐÃ BÁN" : it.price ? money(it.price).toUpperCase() : "GIÁ LIÊN HỆ";
+    var sale = it.old > it.price && it.price && it.st !== "ban";
+    var price = sale
+      ? '<text x="560" y="' + (pY + 70) + '" text-anchor="end" font-family="' + F + '" font-weight="700" font-size="40" fill="#9aa7bd">' + esc(money(it.old)) + "</text>" +
+        '<line x1="' + (560 - money(it.old).length * 20) + '" y1="' + (pY + 56) + '" x2="560" y2="' + (pY + 56) + '" stroke="#9aa7bd" stroke-width="4"/>' +
+        '<rect x="580" y="' + (pY + 18) + '" width="' + (priceTxt.length * 34 + 50) + '" height="72" rx="14" fill="#b3141c"/>' +
+        '<text x="' + (605) + '" y="' + (pY + 70) + '" font-family="' + F + '" font-weight="700" font-size="50" fill="#fff">' + esc(priceTxt) + "</text>"
+      : '<rect x="' + (600 - (priceTxt.length * 34 + 50) / 2) + '" y="' + (pY + 18) + '" width="' + (priceTxt.length * 34 + 50) + '" height="72" rx="14" fill="#b3141c"/>' +
+        '<text x="600" y="' + (pY + 70) + '" text-anchor="middle" font-family="' + F + '" font-weight="700" font-size="50" fill="#fff">' + esc(priceTxt) + "</text>";
+    var chip = it.st === "trung" ? "Xe gắn biển trúng đấu giá · chuyển nhượng đúng quy định" : xm ? "Biển xe máy Ninh Bình" : "Biển ô tô Ninh Bình";
+    return '<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">' +
+      '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1b3460"/><stop offset="1" stop-color="#0b1730"/></linearGradient></defs>' +
+      '<rect width="1200" height="630" fill="url(#g)"/>' +
+      '<rect x="14" y="14" width="1172" height="602" rx="18" fill="none" stroke="#b8860b" stroke-width="4"/>' +
+      '<text x="600" y="92" text-anchor="middle" font-family="' + F + '" font-weight="700" font-size="34" letter-spacing="6" fill="#e0b341">BIỂN SỐ ĐẸP NINH BÌNH</text>' +
+      plate +
+      '<text x="600" y="' + (xm ? 392 : 368) + '" text-anchor="middle" font-family="' + F + '" font-weight="700" font-size="' + tSize + '" fill="#ffd76a">' + esc(title) + "</text>" +
+      price +
+      '<text x="600" y="' + (pY + 140) + '" text-anchor="middle" font-family="' + F + '" font-size="26" fill="#c9d3e6">' + esc(chip) + "</text>" +
+      '<rect x="14" y="566" width="1172" height="50" fill="#b8860b"/>' +
+      '<text x="600" y="600" text-anchor="middle" font-family="' + F + '" font-weight="700" font-size="28" fill="#12233f">Mr. MAI XUÂN HUY · Hotline/Zalo ' + esc(hotFmt(SITE)) + " · maixuanhuy.id.vn</text>" +
+      "</svg>";
   }
   function card(it) {
     var tg = it.tags.slice(0, 2).map(function (t) { return '<span class="tg">' + t + "</span>"; }).join("") || '<span class="tg n">Biển thường</span>';
@@ -305,7 +342,7 @@
       return it;
     }).filter(function (it) { if (!/^\d{2}[A-Z]{1,2}\d?$/.test(it.pre) || seen[it.slug]) return false; seen[it.slug] = 1; return true; });
 
-    var files = {}, urls = [{ loc: "/", lastmod: today, pri: "1.0" }];
+    var files = {}, images = [], urls = [{ loc: "/", lastmod: today, pri: "1.0" }];
     var topicsUsed = [];
 
     // Trang chủ đề
@@ -402,13 +439,14 @@
         '<div class="panel seo-text"><h2>Thông tin biển ' + esc(it.label) + "</h2><p>Biển " + esc(it.label) + " là biển số " + xe +
         (it.pre.indexOf("35") === 0 ? " Ninh Bình" : "") + " thuộc dạng " + esc(loai.toLowerCase()) + ", tổng " + it.nut + " nút, số cuối mang hành " + it.hanh + "." +
         (m ? " Cách đọc cả dãy: <b>" + esc(m.title) + "</b>" + (m.sense ? " – " + esc(m.sense.toLowerCase()) : "") + "." : "") +
-        " Biển hiện " + esc(priceTxt) + (it.st === "trung" ? ", là biển đã trúng đấu giá đang được chào bán lại" : "") +
+        " Biển hiện " + esc(priceTxt) + (it.st === "trung" ? ", là biển đã trúng đấu giá (xe gắn biển, hỗ trợ chuyển nhượng kèm xe đúng quy định)" : "") +
         ". Mr. Mai Xuân Huy hỗ trợ tư vấn, kiểm tra hồ sơ và thủ tục theo đúng quy định. Gọi hoặc nhắn Zalo <a href=\"tel:" + hotline(SITE) + "\">" + hotFmt(SITE) + "</a> để được báo giá và giữ biển.</p></div>" +
         (related.length ? '<h2 class="seo-h2">Biển tương tự</h2><div class="gr">' + related.map(card).join("") + "</div>" : "") +
         '<h2 class="seo-h2">Danh mục biển số</h2>' + topicLinks("");
+      var ogTxt = ogSvg(it, SITE), ogPath = "/og/" + it.slug + "-" + hashStr(ogTxt) + ".png"; images.push({ path: ogPath.slice(1), svg: ogTxt });
       var ld = [cr.ld];
       var product = { "@context": "https://schema.org", "@type": "Product", name: "Biển số " + it.label, sku: it.label,
-        category: "Biển số xe " + xe, description: desc, image: BASE + "/og-mr-xuan-huy-2.jpg",
+        category: "Biển số xe " + xe, description: desc, image: BASE + ogPath,
         brand: { "@type": "Brand", name: "Kho Biển Số Đẹp Mai Xuân Huy" } };
       if (it.price > 0 && it.st !== "ban") product.offers = { "@type": "Offer", url: BASE + path, priceCurrency: "VND", price: it.price,
         availability: "https://schema.org/InStock", itemCondition: "https://schema.org/NewCondition",
@@ -416,7 +454,7 @@
       ld.push(product);
       var title = "Biển số " + it.label + (it.tags[0] ? " " + it.tags[0].toLowerCase() : "") + " – " + (it.st === "ban" ? "Đã bán" : it.price ? money(it.price) : "Giá liên hệ") + " | Biển số đẹp " + (it.pre.indexOf("35") === 0 ? "Ninh Bình" : "") ;
       files["bien/" + it.slug + "/index.html"] = layout({ SITE: SITE, path: path, title: title.trim(), desc: desc, body: body, ld: ld, ogType: "product",
-        pagePlate: { bien: it.label, loai: it.tags[0] || "Biển thường", xe: it.v === "xemay" ? "Xe máy" : "Ô tô", gia: it.st === "ban" ? 0 : it.price, st: ST[it.st] || it.st } });
+        ogImage: ogPath, pagePlate: { bien: it.label, loai: it.tags[0] || "Biển thường", xe: it.v === "xemay" ? "Xe máy" : "Ô tô", gia: it.st === "ban" ? 0 : it.price, st: ST[it.st] || it.st } });
       urls.push({ loc: path, lastmod: it.date && it.date <= today ? it.date : today, pri: it.st === "ban" ? "0.3" : "0.6" });
     });
 
@@ -431,7 +469,7 @@
       urls.map(function (u) { return "  <url><loc>" + BASE + u.loc + "</loc><lastmod>" + u.lastmod + "</lastmod><priority>" + u.pri + "</priority></url>"; }).join("\n") + "\n</urlset>\n";
     files["robots.txt"] = "User-agent: *\nAllow: /\nDisallow: /admin/\n\nSitemap: " + BASE + "/sitemap.xml\n";
 
-    return { files: files, danhMuc: danhMuc, topicDirs: TOPICS.map(function (t) { return t.slug; }), count: { plates: items.length, topics: topicsUsed.length, urls: urls.length } };
+    return { files: files, images: images, danhMuc: danhMuc, topicDirs: TOPICS.map(function (t) { return t.slug; }), count: { plates: items.length, topics: topicsUsed.length, urls: urls.length } };
   }
 
   root.SEOCore = { build: build, TOPICS: TOPICS };
