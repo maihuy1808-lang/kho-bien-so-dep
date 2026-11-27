@@ -43,7 +43,10 @@
   }
 
   /* --- Biển được bấm xem (báo cáo "Mặt hàng" trong GA) --- */
-  var cur = null, lastId = null, lastT = 0;
+  // Trang riêng từng biển (/bien/...): biển của trang được đặt sẵn trong window.__PAGE_PLATE
+  var PAGE = window.__PAGE_PLATE || null;
+  var cur = PAGE, lastId = null, lastT = 0;
+  if (PAGE) ev("view_item", { currency: "VND", value: PAGE.gia || 0, items: [item(PAGE)], bien: PAGE.bien, loai_bien: PAGE.loai, loai_xe: PAGE.xe, vi_tri: "trang_bien" });
   wrap("openPlate", function (id) {
     var i = info(id); if (!i) return;
     cur = i;
@@ -51,7 +54,7 @@
     lastId = id; lastT = Date.now();
     ev("view_item", { currency: "VND", value: i.gia || 0, items: [item(i)], bien: i.bien, loai_bien: i.loai, loai_xe: i.xe });
   });
-  wrap("closeMd", function () { cur = null; });
+  wrap("closeMd", function () { cur = PAGE; });
 
   /* --- Tìm kiếm, bộ lọc, menu --- */
   wrap("doSearch", function () { var q = txt("q"); if (q) ev("search", { search_term: q }); });
@@ -95,8 +98,9 @@
     else if (/tiktok\.com/.test(h)) { ev("mo_tiktok", { vi_tri: a.closest("#bangtin") ? "bang_tin" : "khac" }); return; }
     else if (/facebook\.com/.test(h)) { ev("mo_facebook", {}); return; }
     if (!pt) return;
-    var vt = a.closest("#md") ? "chi_tiet_bien" : a.closest(".fx") ? "thanh_duoi" : a.closest("#lh") ? "form_tu_van" : "khac";
-    ev("lien_he", { phuong_thuc: pt, vi_tri: vt, bien: cur && a.closest("#md") ? cur.bien : "(chung)", loai_bien: cur && a.closest("#md") ? cur.loai : "" });
+    var inPlate = a.closest("#md") || PAGE;
+    var vt = a.closest("#md") ? "chi_tiet_bien" : a.closest(".fx") ? (PAGE ? "trang_bien_thanh_duoi" : "thanh_duoi") : PAGE ? "trang_bien" : a.closest("#lh") ? "form_tu_van" : "khac";
+    ev("lien_he", { phuong_thuc: pt, vi_tri: vt, bien: cur && inPlate ? cur.bien : "(chung)", loai_bien: cur && inPlate ? cur.loai : "" });
   }, true);
 
   /* --- Thông báo dùng thống kê (theo quy định bảo vệ dữ liệu cá nhân) --- */
