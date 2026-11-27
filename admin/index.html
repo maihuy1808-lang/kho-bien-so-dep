@@ -176,7 +176,7 @@ label{font-size:13px;color:var(--mut);display:block;margin-bottom:4px}
   <span id="saveInfo">Chưa có thay đổi.</span>
 </div></div>
 
-<script src="../meaning.js?v=20261126h"></script>
+<script src="../meaning.js?v=20261127a"></script>
 <script>
 (function () {
   "use strict";
@@ -251,17 +251,26 @@ label{font-size:13px;color:var(--mut);display:block;margin-bottom:4px}
     L.push("var POSTS = [");
     d.POSTS.forEach(function (p, i) { L.push("  { t: " + q(p.t) + ", d: " + q(p.d) + ", tag: " + q(p.tag) + " }" + (i < d.POSTS.length - 1 ? "," : "")); });
     L.push("];", "");
+    L.push("/* Video TikTok nằm ở file videos.js */", "");
+    return L.join("\n");
+  }
+  // Video TikTok lưu ở file riêng videos.js – lưu biển số không bao giờ đụng tới video
+  function serializeVideos(V) {
+    var L = [];
     L.push("/* ---------------------------------------------------------");
     L.push("   BẢNG TIN – VIDEO TIKTOK (@mrxuanhuy)");
     L.push("   Mỗi video: { id: số video TikTok, t: tiêu đề ngắn, d: ngày đăng, b: biển số liên quan (nếu có) }");
     L.push("   Thêm/xóa ở trang /admin → tab \"Video TikTok\". Video mới nhất để trên cùng.");
     L.push("   --------------------------------------------------------- */");
     L.push("var VIDEOS = [");
-    (d.VIDEOS || []).forEach(function (v, i) { L.push("  { id: " + q(v.id) + ", t: " + q(v.t) + ", d: " + q(v.d) + ", b: " + q(v.b) + " }" + (i < d.VIDEOS.length - 1 ? "," : "")); });
+    (V || []).forEach(function (v, i) { L.push("  { id: " + q(v.id) + ", t: " + q(v.t) + ", d: " + q(v.d) + ", b: " + q(v.b) + " }" + (i < V.length - 1 ? "," : "")); });
     L.push("];", "");
     return L.join("\n");
   }
-  function changed() { return data && JSON.stringify(data) !== original; }
+  function plateState() { return JSON.stringify({ SITE: data.SITE, PLATES: data.PLATES, PROVINCES: data.PROVINCES, POSTS: data.POSTS }); }
+  function videoState() { return JSON.stringify(data.VIDEOS || []); }
+  var originalV = "";
+  function changed() { return data && (plateState() !== original || videoState() !== originalV); }
   function markDirty() {
     var c = changed();
     $("saveInfo").textContent = c ? "Có thay đổi chưa lưu." : "Chưa có thay đổi.";
@@ -298,12 +307,19 @@ label{font-size:13px;color:var(--mut);display:block;margin-bottom:4px}
     location.reload();
   };
 
+  var shaV = "";
   function loadData() {
     return gh("/contents/" + FILE + "?ref=" + BRANCH + "&t=" + Date.now()).then(function (f) {
       sha = f.sha;
       data = parseData(b64dec(f.content));
       data.PLATES = data.PLATES.map(function (p) { return [p[0], p[1], p[2] || "oto", +p[3] || 0, p[4] || "con", +p[5] === 1 ? 1 : 0, +p[6] || 0, p[7] || "", p[8] || ""]; });
-      original = JSON.stringify(data);
+      var fromData = data.VIDEOS || [];
+      return gh("/contents/videos.js?ref=" + BRANCH + "&t=" + Date.now()).then(function (fv) {
+        shaV = fv.sha;
+        data.VIDEOS = new Function(b64dec(fv.content) + "\n;return typeof VIDEOS!=='undefined'?VIDEOS:[];")();
+      }, function (e) { if (e.status !== 404) throw e; shaV = ""; data.VIDEOS = fromData; });
+    }).then(function () {
+      original = plateState(); originalV = videoState();
       drawAll(); markDirty();
     });
   }
@@ -446,6 +462,7 @@ label{font-size:13px;color:var(--mut);display:block;margin-bottom:4px}
   /* ---------- lưu ---------- */
   window.save = function () {
     if (!changed()) { msg("appMsg", "warn", "Chưa có thay đổi nào để lưu."); return; }
+    if (!data.VIDEOS) data.VIDEOS = [];
     var bad = data.PLATES.filter(function (p) { return !validPlate(p); });
     if (bad.length) { msg("appMsg", "err", "Có " + bad.length + " biển sai định dạng (ô viền đỏ): " + esc(bad.map(function (p) { return p[0] + "-" + p[1]; }).join(", ")) + ". Đầu biển dạng 35A hoặc 35B1, đuôi số dạng 999.99."); tab("plates"); return; }
     var seen = {}, dups = [];
@@ -453,12 +470,23 @@ label{font-size:13px;color:var(--mut);display:block;margin-bottom:4px}
     var badSale = data.PLATES.filter(function (p) { return p[6] && !(p[6] > p[3] && p[3] > 0); });
     if (badSale.length) { msg("appMsg", "err", "Giá trước khi giảm phải lớn hơn giá bán: " + esc(badSale.map(function (p) { return p[0] + "-" + p[1]; }).join(", ")) + ". Anh sửa lại hoặc xóa ô giá cũ."); tab("plates"); return; }
     if (dups.length) { msg("appMsg", "err", "Biển bị trùng: " + esc(dups.join(", ")) + ". Anh xóa bớt một dòng rồi lưu lại."); tab("plates"); return; }
-    var text = serialize(data);
-    try { parseData(text); } catch (e) { msg("appMsg", "err", "Lỗi tạo dữ liệu: " + esc(e.message)); return; }
+    var text = serialize(data), vtext = serializeVideos(data.VIDEOS);
+    try { parseData(text); new Function(vtext + "\n;return VIDEOS;")(); } catch (e) { msg("appMsg", "err", "Lỗi tạo dữ liệu: " + esc(e.message)); return; }
+    var needPlates = plateState() !== original, needVideos = videoState() !== originalV;
     $("saveBtn").disabled = true; msg("appMsg", "warn", "Đang lưu lên GitHub…");
-    gh("/contents/" + FILE, { method: "PUT", body: JSON.stringify({ message: "Cap nhat du lieu tu trang admin", content: b64enc(text), sha: sha, branch: BRANCH }) })
-      .then(function (r) {
-        sha = r.content.sha; original = JSON.stringify(data); drawPlates(); markDirty();
+    var job = Promise.resolve();
+    if (needPlates) job = job.then(function () {
+      return gh("/contents/" + FILE, { method: "PUT", body: JSON.stringify({ message: "Cap nhat du lieu tu trang admin", content: b64enc(text), sha: sha, branch: BRANCH }) })
+        .then(function (r) { sha = r.content.sha; original = plateState(); });
+    });
+    if (needVideos) job = job.then(function () {
+      var body = { message: "Cap nhat video TikTok tu trang admin", content: b64enc(vtext), branch: BRANCH };
+      if (shaV) body.sha = shaV;
+      return gh("/contents/videos.js", { method: "PUT", body: JSON.stringify(body) }).then(function (r) { shaV = r.content.sha; originalV = videoState(); });
+    });
+    job
+      .then(function () {
+        drawPlates(); markDirty();
         msg("appMsg", "ok", "✔ Đã lưu. Website sẽ cập nhật sau khoảng 1–2 phút. <a href=\"../\" target=\"_blank\" rel=\"noopener\">Mở website ↗</a>");
       }).catch(function (e) {
         msg("appMsg", "err", e.status === 409 ? "Dữ liệu trên GitHub vừa bị sửa ở nơi khác. Anh bấm <b>Hủy thay đổi</b> để tải bản mới rồi sửa lại." :
