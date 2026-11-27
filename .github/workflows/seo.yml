@@ -1,0 +1,52 @@
+name: Tao trang SEO
+
+# Chạy mỗi khi dữ liệu biển / video / bộ tạo thay đổi, hoặc bấm tay
+on:
+  push:
+    branches: [main]
+    paths:
+      - "data.js"
+      - "videos.js"
+      - "meaning.js"
+      - "seo/**"
+      - "index.html"
+      - ".github/workflows/seo.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+
+concurrency:
+  group: seo-build
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Tao trang
+        run: node seo/build.js
+      - name: Luu ket qua
+        run: |
+          git config user.name "seo-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A bien sitemap.xml robots.txt index.html bien-* dau-gia-bien-so-ninh-binh 2>/dev/null || true
+          git add -A .
+          if git diff --cached --quiet; then
+            echo "Khong co thay doi"
+            exit 0
+          fi
+          git commit -m "Tu cap nhat trang SEO tu data.js"
+          for i in 1 2 3; do
+            git pull --rebase origin main && git push origin HEAD:main && break
+            sleep 5
+          done
+      - name: Dung lai trang (GitHub Pages)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh api -X POST "repos/${{ github.repository }}/pages/builds" || true
