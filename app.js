@@ -241,6 +241,11 @@
       (m.verse ? '<p class="tho">' + esc(m.verse).split(" / ").join("<br>") + "</p>" : "") +
       (m.reading ? '<p class="doc">Đọc từng số: ' + esc(m.reading) + "</p>" : "") + "</div>";
   }
+  // Thông tin biển cho phần thống kê (analytics.js) – không chứa dữ liệu cá nhân
+  window.__plateInfo = function (id) {
+    var it = ITEMS[id]; if (!it) return null;
+    return { bien: it.pre + "-" + it.tail, loai: it.tags[0] || "Biển thường", xe: it.v === "xemay" ? "Xe máy" : "Ô tô", gia: it.st === "ban" ? 0 : it.price, st: ST_TXT[it.st] || it.st, noibat: it.hot ? "co" : "khong" };
+  };
   window.closeMd = function () { $("md").classList.remove("on"); };
   document.addEventListener("keydown", function (e) { if (e.key === "Escape") window.closeMd(); });
 
