@@ -10,7 +10,7 @@
 (function (root) {
   "use strict";
   var BASE = "https://maixuanhuy.id.vn";
-  var CSS_V = "seo4";
+  var CSS_V = "seo5";
 
   /* ---- Nhận diện loại biển (giống app.js) ---- */
   var HANH = ["Thổ", "Thủy", "Hỏa", "Mộc", "Kim", "Thổ", "Thủy", "Hỏa", "Mộc", "Kim"];
@@ -60,8 +60,74 @@
   /* ---- Chủ đề ---- */
   var TOPICS = [
     { slug: "bien-so-dep-ninh-binh", h1: "Biển số đẹp Ninh Bình", kw: "biển số đẹp Ninh Bình",
-      test: function (it) { return it.pre.indexOf("35") === 0; },
-      intro: "Tổng hợp biển số đẹp Ninh Bình (mã 35) đang chào bán: biển ô tô 35A, 35B và biển xe máy, đủ các dòng ngũ quý, tứ quý, tam hoa, thần tài, phát lộc. Giá công khai, cập nhật liên tục, hỗ trợ sang tên và hồ sơ theo đúng quy định." },
+      test: function (it) { return /^(35|18|90)/.test(it.pre); },
+      intro: "Kho biển số đẹp Ninh Bình của Mr. Mai Xuân Huy: biển ô tô 35A, 35B và biển xe máy, đủ các dòng ngũ quý, tứ quý, tam hoa, thần tài, phát lộc. Giá công khai, cập nhật liên tục, hỗ trợ hồ sơ chuyển nhượng theo đúng quy định. Phục vụ khách Ninh Bình, Nam Định, Hà Nam.",
+      content: "<h2>Kho biển số đẹp Ninh Bình – Nam Định – Hà Nam</h2>" +
+        "<p>Từ ngày 01/07/2025, tỉnh Ninh Bình mới gồm Ninh Bình, Nam Định và Hà Nam cũ. Theo Thông tư 51/2025/TT-BCA, biển số xe của tỉnh dùng ba ký hiệu: <b>35</b> (Ninh Bình cũ), <b>18</b> (Nam Định cũ) và <b>90</b> (Hà Nam cũ). Vì vậy khách ở Hoa Lư, Tam Điệp, Kim Sơn, Nam Định, Phủ Lý… đều có thể chọn biển đẹp tại kho này.</p>" +
+        "<h2>Vì sao chọn Kho Biển Số Đẹp Mai Xuân Huy?</h2><ul>" +
+        "<li><b>Giá công khai</b> từng biển, không phải nhắn tin hỏi giá.</li>" +
+        "<li><b>Dịch nghĩa và xem phong thủy</b> từng biển: số nút, ngũ hành, hợp tuổi nào.</li>" +
+        "<li><b>Nhận đấu giá biển số hộ</b> trọn gói, theo sát phiên đấu giá trực tuyến.</li>" +
+        "<li><b>Tư vấn xe VinFast kèm biển đẹp</b>, hỗ trợ hồ sơ chuyển nhượng xe gắn biển trúng đấu giá đúng luật.</li></ul>" +
+        '<p>Xem theo loại: <a href="/bien-o-to/">biển số ô tô đẹp Ninh Bình</a> · <a href="/bien-xe-may/">biển số xe máy đẹp Ninh Bình</a> · <a href="/bien-ngu-quy/">biển ngũ quý</a> · <a href="/bien-than-tai/">biển thần tài</a> · <a href="/dau-gia-bien-so-ninh-binh/">đấu giá biển số Ninh Bình</a> · <a href="/bien-so-ninh-binh-sau-sap-nhap/">biển số Ninh Bình sau sáp nhập</a>.</p>',
+      faq: [
+        ["Mua biển số đẹp Ninh Bình ở đâu uy tín?", "Kho Biển Số Đẹp Mai Xuân Huy (maixuanhuy.id.vn) công khai giá từng biển 35A, 35B và biển xe máy, kèm ý nghĩa phong thủy. Anh/chị gọi hoặc nhắn Zalo 0326.583.583 để xem biển và được tư vấn hồ sơ."],
+        ["Biển số Ninh Bình sau sáp nhập là bao nhiêu?", "Từ 01/07/2025, tỉnh Ninh Bình (gồm Ninh Bình, Nam Định, Hà Nam cũ) dùng ba ký hiệu biển số 35, 18 và 90 theo Thông tư 51/2025/TT-BCA."],
+        ["Biển số trúng đấu giá có bán lại được không?", "Theo Luật Trật tự, an toàn giao thông đường bộ 2024, biển số trúng đấu giá không được chuyển nhượng riêng, nhưng được chuyển nhượng cùng với chiếc xe đang gắn biển đó. Kho hỗ trợ hồ sơ chuyển nhượng theo đúng quy định."],
+        ["Có biển số đẹp Ninh Bình giá rẻ không?", 'Có. Xem mục <a href="/bien-so-dep-gia-re/">biển số đẹp giá rẻ dưới 100 triệu</a>, gồm nhiều biển xe máy và biển ô tô tam hoa, phát lộc.']
+      ] },
+    { slug: "bien-so-ninh-binh-sau-sap-nhap", h1: "Biển số Ninh Bình sau sáp nhập: 35, 18, 90", kw: "biển số Ninh Bình sau sáp nhập", always: true,
+      test: function () { return false; },
+      title: "Biển số Ninh Bình sau sáp nhập là bao nhiêu? 35, 18, 90 – giải đáp đầy đủ",
+      desc: "Từ 01/07/2025 tỉnh Ninh Bình (gồm Nam Định, Hà Nam cũ) dùng biển số 35, 18, 90. Biển số Nam Định, Hà Nam cũ có phải đổi không? Giải đáp và kho biển số đẹp Ninh Bình.",
+      intro: "Sau khi sắp xếp đơn vị hành chính, tỉnh Ninh Bình mới gồm Ninh Bình, Nam Định và Hà Nam cũ. Dưới đây là giải đáp ngắn gọn về ký hiệu biển số xe của tỉnh từ ngày 01/07/2025.",
+      fallbackTitle: "Biển số đẹp Ninh Bình đang chào bán",
+      contentTop: "<h2>Biển số xe Ninh Bình mới là bao nhiêu?</h2>" +
+        "<p>Theo Thông tư 51/2025/TT-BCA (hiệu lực từ 01/07/2025), tỉnh Ninh Bình sử dụng <b>ba ký hiệu biển số: 35, 18 và 90</b>:</p><ul>" +
+        "<li><b>35</b> – Ninh Bình cũ (vd 35A, 35B, biển xe máy 35AA, 35AB…)</li>" +
+        "<li><b>18</b> – Nam Định cũ (vd 18A…)</li>" +
+        "<li><b>90</b> – Hà Nam cũ (vd 90A…)</li></ul>" +
+        "<h2>Xe đang mang biển 18 hoặc 90 có phải đổi biển không?</h2>" +
+        "<p>Biển số 18, 90 vẫn là biển hợp lệ của tỉnh Ninh Bình mới, nên xe đang dùng biển cũ <b>vẫn tiếp tục lưu hành bình thường</b>. Việc cấp, đổi biển cụ thể do Phòng Cảnh sát giao thông Công an tỉnh hướng dẫn; khi cần làm thủ tục, anh/chị nên hỏi trực tiếp cơ quan đăng ký xe.</p>" +
+        "<h2>Người Nam Định, Hà Nam có chọn được biển 35 đẹp không?</h2>" +
+        "<p>Sau sáp nhập, Nam Định và Hà Nam cũ cùng thuộc tỉnh Ninh Bình. Anh/chị ở khu vực này có thể tham gia đấu giá biển số của tỉnh, hoặc mua xe gắn biển đẹp trúng đấu giá theo quy định chuyển nhượng. Mr. Mai Xuân Huy hỗ trợ tư vấn trọn gói.</p>",
+      content: '<p>Xem thêm: <a href="/bien-so-dep-ninh-binh/">kho biển số đẹp Ninh Bình</a> · <a href="/bien-so-dep-nam-dinh/">biển số đẹp Nam Định (18)</a> · <a href="/bien-so-dep-ha-nam/">biển số đẹp Hà Nam (90)</a> · <a href="/dau-gia-bien-so-ninh-binh/">đấu giá biển số Ninh Bình</a>.</p>',
+      faq: [
+        ["Biển số Ninh Bình mới là bao nhiêu?", "Từ 01/07/2025, biển số xe tỉnh Ninh Bình gồm ba ký hiệu 35, 18 và 90 (theo Thông tư 51/2025/TT-BCA)."],
+        ["Biển số Nam Định sau sáp nhập là gì?", "Nam Định cũ nay thuộc tỉnh Ninh Bình. Ký hiệu 18 của Nam Định cũ vẫn là một trong ba ký hiệu biển số của tỉnh Ninh Bình mới."],
+        ["Biển số Hà Nam sau sáp nhập là gì?", "Hà Nam cũ nay thuộc tỉnh Ninh Bình. Ký hiệu 90 của Hà Nam cũ vẫn là một trong ba ký hiệu biển số của tỉnh Ninh Bình mới."],
+        ["Biển 35AA, 35AB là ở đâu?", "35AA, 35AB, 35AC… là biển xe máy của tỉnh Ninh Bình (ký hiệu 35)."]
+      ] },
+    { slug: "bien-so-dep-nam-dinh", h1: "Biển số đẹp Nam Định (đầu 18)", kw: "biển số đẹp Nam Định", always: true,
+      test: function (it) { return it.pre.indexOf("18") === 0; },
+      title: "Biển số đẹp Nam Định (18) – kho biển đẹp Nam Định, Ninh Bình | Mr. Mai Xuân Huy",
+      desc: "Biển số đẹp Nam Định đầu 18 và biển 35 Ninh Bình sau sáp nhập: ngũ quý, tứ quý, thần tài, phát lộc có giá công khai. Nhận tìm biển, đấu giá hộ. Hotline/Zalo 0326.583.583.",
+      intro: "Từ 01/07/2025, Nam Định cũ thuộc tỉnh Ninh Bình, biển số dùng chung các ký hiệu 35, 18, 90. Kho Biển Số Đẹp Mai Xuân Huy nhận tìm biển đẹp đầu 18 theo yêu cầu và giới thiệu biển đẹp Ninh Bình cho khách Nam Định.",
+      fallbackTitle: "Biển số đẹp đang có sẵn cho khách Nam Định",
+      content: "<h2>Mua biển số đẹp Nam Định như thế nào?</h2><ul>" +
+        "<li><b>Biển đầu 18 theo yêu cầu:</b> gửi số mong muốn, kho tìm và báo giá.</li>" +
+        "<li><b>Biển 35 Ninh Bình đẹp:</b> cùng tỉnh sau sáp nhập, có sẵn nhiều biển ngũ quý, tứ quý, thần tài.</li>" +
+        "<li><b>Đấu giá biển số hộ:</b> theo sát các phiên đấu giá trực tuyến của tỉnh.</li></ul>" +
+        '<p>Xem thêm <a href="/bien-so-ninh-binh-sau-sap-nhap/">biển số Ninh Bình sau sáp nhập</a> và <a href="/bien-xe-may/">biển số xe máy đẹp</a>.</p>',
+      faq: [
+        ["Biển số Nam Định cũ là bao nhiêu?", "Biển số Nam Định cũ là 18. Từ 01/07/2025, 18 là một trong ba ký hiệu biển số của tỉnh Ninh Bình mới (35, 18, 90)."],
+        ["Ở Nam Định có mua được biển số đẹp không?", "Có. Kho Biển Số Đẹp Mai Xuân Huy nhận tìm biển đầu 18 theo yêu cầu, giới thiệu biển 35 đẹp và đấu giá hộ cho khách Nam Định. Gọi/Zalo 0326.583.583."]
+      ] },
+    { slug: "bien-so-dep-ha-nam", h1: "Biển số đẹp Hà Nam (đầu 90)", kw: "biển số đẹp Hà Nam", always: true,
+      test: function (it) { return it.pre.indexOf("90") === 0; },
+      title: "Biển số đẹp Hà Nam (90) – kho biển đẹp Hà Nam, Ninh Bình | Mr. Mai Xuân Huy",
+      desc: "Biển số đẹp Hà Nam đầu 90 và biển 35 Ninh Bình sau sáp nhập: ngũ quý, tứ quý, thần tài, phát lộc có giá công khai. Nhận tìm biển, đấu giá hộ. Hotline/Zalo 0326.583.583.",
+      intro: "Từ 01/07/2025, Hà Nam cũ thuộc tỉnh Ninh Bình, biển số dùng chung các ký hiệu 35, 18, 90. Kho Biển Số Đẹp Mai Xuân Huy nhận tìm biển đẹp đầu 90 theo yêu cầu và giới thiệu biển đẹp Ninh Bình cho khách Phủ Lý, Duy Tiên, Kim Bảng, Thanh Liêm, Bình Lục, Lý Nhân.",
+      fallbackTitle: "Biển số đẹp đang có sẵn cho khách Hà Nam",
+      content: "<h2>Mua biển số đẹp Hà Nam như thế nào?</h2><ul>" +
+        "<li><b>Biển đầu 90 theo yêu cầu:</b> gửi số mong muốn, kho tìm và báo giá.</li>" +
+        "<li><b>Biển 35 Ninh Bình đẹp:</b> cùng tỉnh sau sáp nhập, có sẵn nhiều biển ngũ quý, tứ quý, thần tài.</li>" +
+        "<li><b>Đấu giá biển số hộ:</b> theo sát các phiên đấu giá trực tuyến của tỉnh.</li></ul>" +
+        '<p>Xem thêm <a href="/bien-so-ninh-binh-sau-sap-nhap/">biển số Ninh Bình sau sáp nhập</a> và <a href="/bien-o-to/">biển số ô tô đẹp</a>.</p>',
+      faq: [
+        ["Biển số Hà Nam cũ là bao nhiêu?", "Biển số Hà Nam cũ là 90. Từ 01/07/2025, 90 là một trong ba ký hiệu biển số của tỉnh Ninh Bình mới (35, 18, 90)."],
+        ["Ở Hà Nam có mua được biển số đẹp không?", "Có. Kho Biển Số Đẹp Mai Xuân Huy nhận tìm biển đầu 90 theo yêu cầu, giới thiệu biển 35 đẹp và đấu giá hộ cho khách Hà Nam. Gọi/Zalo 0326.583.583."]
+      ] },
     { slug: "bien-ngu-quy", h1: "Biển số ngũ quý Ninh Bình", kw: "biển ngũ quý", tag: "Ngũ quý",
       intro: "Biển ngũ quý – năm số giống nhau như 666.66, 888.88 – là dòng biển hiếm và có giá trị nhất. Dưới đây là các biển ngũ quý đang có tại kho Ninh Bình." },
     { slug: "bien-tu-quy", h1: "Biển số tứ quý Ninh Bình", kw: "biển tứ quý", tag: "Tứ quý",
@@ -76,10 +142,33 @@
       intro: "Biển ông địa kết thúc bằng 38 hoặc 78, tượng trưng cho sự che chở, giữ đất, giữ của cho gia chủ." },
     { slug: "bien-sanh-tien", h1: "Biển số sảnh tiến Ninh Bình", kw: "biển sảnh tiến", tag: "Sảnh tiến",
       intro: "Biển sảnh tiến có các số tăng dần (vd 123.45, 345.67), mang ý nghĩa từng bước thăng tiến." },
-    { slug: "bien-o-to", h1: "Biển số ô tô đẹp Ninh Bình", kw: "biển số ô tô đẹp Ninh Bình", v: "oto",
-      intro: "Biển số ô tô đẹp Ninh Bình 35A, 35B đang chào bán, xếp theo giá từ cao xuống thấp." },
+    { slug: "bien-o-to", h1: "Biển số ô tô đẹp Ninh Bình (35A, 35B)", kw: "biển số ô tô đẹp Ninh Bình", v: "oto",
+      intro: "Biển số ô tô đẹp Ninh Bình 35A, 35B đang chào bán: ngũ quý, tứ quý, tam hoa, thần tài 39 – 79, phát lộc 68 – 86, xếp theo giá từ cao xuống thấp. Phục vụ khách Ninh Bình, Nam Định, Hà Nam.",
+      content: "<h2>Kho biển số ô tô đẹp Ninh Bình có những loại nào?</h2><ul>" +
+        '<li><a href="/bien-ngu-quy/"><b>Biển ngũ quý</b></a>: 5 số giống nhau (888.88, 666.66) – hiếm và giá trị nhất.</li>' +
+        '<li><a href="/bien-tu-quy/"><b>Biển tứ quý</b></a>: 4 số giống nhau (899.99, 988.88) – sang, dễ nhớ.</li>' +
+        '<li><a href="/bien-tam-hoa/"><b>Biển tam hoa</b></a>: 3 số giống nhau – đẹp, giá dễ tiếp cận.</li>' +
+        '<li><a href="/bien-than-tai/"><b>Biển thần tài</b></a> (đuôi 39, 79) và <a href="/bien-phat-loc/"><b>biển phát lộc</b></a> (68, 86, 88) – được dân kinh doanh ưa chuộng.</li></ul>' +
+        "<h2>Mua biển số ô tô đẹp đã trúng đấu giá có hợp pháp không?</h2>" +
+        "<p>Theo Luật Trật tự, an toàn giao thông đường bộ 2024, biển số trúng đấu giá <b>không được bán riêng tấm biển</b>, nhưng <b>được chuyển nhượng cùng với chiếc xe</b> đang gắn biển. Khi mua, anh/chị nhận chuyển nhượng cả xe và làm thủ tục đăng ký theo quy định. Mr. Mai Xuân Huy hỗ trợ kiểm tra hồ sơ, giấy tờ và hướng dẫn thủ tục trọn gói.</p>" +
+        "<h2>Chọn biển ô tô hợp tuổi, hợp mệnh</h2>" +
+        '<p>Mỗi biển trong kho đều có số nút, ngũ hành và cách đọc ý nghĩa cả dãy số. Anh/chị có thể dùng công cụ <a href="/#phongthuy">tìm biển hợp tuổi</a> trên trang chủ: nhập năm sinh là ra danh sách biển hợp mệnh.</p>',
+      faq: [
+        ["Biển số ô tô đẹp Ninh Bình giá bao nhiêu?", "Giá tùy loại biển: biển tam hoa, phát lộc thường từ khoảng 80–200 triệu; tứ quý, ngũ quý từ vài trăm triệu đến vài tỷ. Giá từng biển được ghi công khai ngay trên trang."],
+        ["Biển 35A là ở đâu?", "35A là biển số ô tô của tỉnh Ninh Bình. Từ 01/07/2025, tỉnh Ninh Bình (gồm Nam Định, Hà Nam cũ) dùng các ký hiệu 35, 18, 90."],
+        ["Mua biển ô tô trúng đấu giá cần làm gì?", "Biển trúng đấu giá được chuyển nhượng cùng với xe. Anh/chị nhận chuyển nhượng xe đang gắn biển rồi đăng ký sang tên theo quy định; kho hỗ trợ hồ sơ trọn gói."],
+        ["Có biển ô tô đẹp giá rẻ không?", 'Có, xem <a href="/bien-so-dep-gia-re/">biển số đẹp giá dưới 100 triệu</a>.']
+      ] },
     { slug: "bien-xe-may", h1: "Biển số xe máy đẹp Ninh Bình", kw: "biển số xe máy đẹp Ninh Bình", v: "xemay",
-      intro: "Biển số xe máy đẹp Ninh Bình (35AA, 35AB, 35AC, 35B1…) đủ loại tứ quý, ngũ quý, tam hoa với giá tốt." },
+      intro: "Biển số xe máy đẹp Ninh Bình (35AA, 35AB, 35AC, 35B1…) đủ loại tứ quý, ngũ quý, tam hoa với giá tốt. Phục vụ khách Ninh Bình, Nam Định, Hà Nam.",
+      content: "<h2>Biển số xe máy đẹp Ninh Bình – chọn thế nào?</h2>" +
+        "<p>Biển xe máy Ninh Bình có dạng 35-AA, 35-AB, 35-AC… phía trên và dãy 5 số phía dưới. Dòng được ưa chuộng nhất là <b>ngũ quý</b> (555.55), <b>tứ quý</b> (388.88), <b>tam hoa</b> và đuôi <b>thần tài 39 – 79</b>. Từ 01/01/2025, biển số xe máy cũng được đưa ra đấu giá trực tuyến (Nghị định 156/2024/NĐ-CP), bước giá 500 nghìn đồng.</p>" +
+        '<p>Xem thêm <a href="/bien-so-dep-ninh-binh/">kho biển số đẹp Ninh Bình</a> và <a href="/dau-gia-bien-so-ninh-binh/">dịch vụ đấu giá biển số hộ</a>.</p>',
+      faq: [
+        ["Biển số xe máy đẹp Ninh Bình giá bao nhiêu?", "Biển xe máy tam hoa, tứ quý thường từ khoảng 20–100 triệu; biển ngũ quý cao hơn. Giá từng biển được ghi công khai trên trang."],
+        ["Biển 35AA, 35AB là ở đâu?", "35AA, 35AB, 35AC… là biển số xe máy của tỉnh Ninh Bình."],
+        ["Biển số xe máy có được đấu giá không?", "Có. Từ 01/01/2025, biển số xe máy được đấu giá trực tuyến theo Nghị định 156/2024/NĐ-CP. Mr. Mai Xuân Huy nhận đấu giá hộ."]
+      ] },
     { slug: "bien-35a", h1: "Biển số đẹp 35A", kw: "biển 35A", pre: "35A",
       intro: "Các biển số đẹp đầu 35A (ô tô Ninh Bình) đang có sẵn, kèm giá và ý nghĩa từng biển." },
     { slug: "bien-35b", h1: "Biển số đẹp 35B", kw: "biển 35B", pre: "35B",
@@ -88,7 +177,19 @@
       test: function (it) { return it.price > 0 && it.price < 1e8; },
       intro: "Biển số đẹp giá dưới 100 triệu đồng – lựa chọn hợp lý cho người muốn có biển đẹp mà không tốn nhiều chi phí." },
     { slug: "dau-gia-bien-so-ninh-binh", h1: "Đấu giá biển số Ninh Bình – nhận đấu giá hộ", kw: "đấu giá biển số Ninh Bình", st: "trung", service: true,
-      intro: "Mr. Mai Xuân Huy nhận tư vấn và đấu giá biển số hộ tại Ninh Bình: chọn biển, đăng ký, nộp tiền đặt trước, theo sát phiên đấu giá trực tuyến và hoàn tất thủ tục. Dưới đây là những biển đã trúng đấu giá đang được chào bán lại." }
+      intro: "Mr. Mai Xuân Huy nhận tư vấn và đấu giá biển số hộ tại Ninh Bình, Nam Định, Hà Nam: chọn biển, đăng ký, nộp tiền đặt trước, theo sát phiên đấu giá trực tuyến và hoàn tất thủ tục. Dưới đây là những biển đã trúng đấu giá đang được chào bán cùng xe.",
+      content: "<h2>Đấu giá biển số Ninh Bình: những điều cần biết</h2><ul>" +
+        "<li><b>Hình thức:</b> đấu giá trực tuyến, trả giá lên (Nghị định 156/2024/NĐ-CP, hiệu lực từ 01/01/2025).</li>" +
+        "<li><b>Bước giá:</b> 5 triệu đồng với biển ô tô; 500 nghìn đồng với biển xe máy.</li>" +
+        "<li><b>Phạm vi:</b> từ 01/07/2025, đấu giá biển số của tỉnh Ninh Bình gồm cả ký hiệu 35, 18, 90 (Nam Định, Hà Nam cũ).</li>" +
+        "<li><b>Sau khi trúng:</b> biển được đăng ký cho xe của người trúng; biển trúng đấu giá không được bán riêng, chỉ được chuyển nhượng cùng với xe.</li></ul>" +
+        '<p>Xem thêm: <a href="/bien-so-ninh-binh-sau-sap-nhap/">biển số Ninh Bình sau sáp nhập</a> · <a href="/bien-o-to/">biển số ô tô đẹp Ninh Bình</a>.</p>',
+      faq: [
+        ["Đấu giá biển số Ninh Bình ở đâu?", "Đấu giá biển số xe được tổ chức trực tuyến trên trang của đơn vị đấu giá được Bộ Công an lựa chọn. Mr. Mai Xuân Huy hướng dẫn đăng ký và theo sát phiên đấu giá cùng anh/chị."],
+        ["Bước giá đấu biển số là bao nhiêu?", "Theo Nghị định 156/2024/NĐ-CP: 5 triệu đồng đối với biển ô tô và 500 nghìn đồng đối với biển xe máy."],
+        ["Biển số trúng đấu giá có được chuyển nhượng không?", "Biển trúng đấu giá không được chuyển nhượng riêng, nhưng được chuyển nhượng cùng với xe đang gắn biển theo Luật Trật tự, an toàn giao thông đường bộ 2024."],
+        ["Phí dịch vụ đấu giá hộ là bao nhiêu?", "Tùy biển và mức giá dự kiến. Anh/chị gọi hoặc nhắn Zalo 0326.583.583 để được báo phí cụ thể, tư vấn miễn phí."]
+      ] }
   ];
   function inTopic(t, it) {
     if (t.test && !t.test(it)) return false;
@@ -121,7 +222,7 @@
       '<div class="top"><div class="w"><span>📍 Ninh Bình · Hỗ trợ ' + esc(S.gioHoTro || "8h – 22h30") + '</span><span>Hotline/Zalo: <b>' + esc(hotFmt(S)) + "</b></span></div></div>\n" +
       '<header><div class="w hd"><a class="logo" href="/"><span class="mk">BSĐ</span><span><b>KHO BIỂN SỐ ĐẸP</b><small>Mai Xuân Huy · Ninh Bình</small></span></a>' +
       '<a class="btn sm-hide" href="/#kho">Xem toàn bộ kho biển →</a></div>\n' +
-      '<nav><div class="w nv"><a class="nvl" href="/">Trang chủ</a><a class="nvl" href="/bien-so-dep-ninh-binh/">Biển số đẹp Ninh Bình</a><a class="nvl" href="/bien-xe-may/">Xe máy</a><a class="nvl" href="/dau-gia-bien-so-ninh-binh/">Đấu giá hộ</a></div></nav></header>\n' +
+      '<nav><div class="w nv"><a class="nvl" href="/">Trang chủ</a><a class="nvl" href="/bien-so-dep-ninh-binh/">Biển số đẹp Ninh Bình</a><a class="nvl" href="/bien-o-to/">Ô tô</a><a class="nvl" href="/bien-xe-may/">Xe máy</a><a class="nvl" href="/dau-gia-bien-so-ninh-binh/">Đấu giá hộ</a></div></nav></header>\n' +
       '<main class="w seo-main">\n' + o.body + "\n</main>\n" +
       '<footer><div class="w"><b>KHO BIỂN SỐ ĐẸP NINH BÌNH – MR. MAI XUÂN HUY</b>' +
       "<p>Chuyên nghiệp – Nhiệt tình – Trung thực · Ninh Bình · Hotline/Zalo: " + esc(hotFmt(S)) + "</p>" +
@@ -182,9 +283,22 @@
     // Trang chủ đề
     TOPICS.forEach(function (t) {
       var list = items.filter(function (it) { return inTopic(t, it) && (t.service || forSale(it)); }).sort(sortByPrice);
-      if (!list.length) return;
+      if (!list.length && !t.always) return;
       topicsUsed.push({ t: t, n: list.length });
     });
+    // Biển gợi ý khi trang khu vực/bài viết chưa có biển đúng đầu số
+    var featured = items.filter(function (it) { return forSale(it) && it.v === "oto"; }).sort(function (a, b) { return (b.hot - a.hot) || sortByPrice(a, b); }).slice(0, 12);
+    function faqHtml(t) {
+      if (!t.faq || !t.faq.length) return "";
+      return '<div class="panel seo-text seo-faq"><h2>Câu hỏi thường gặp về ' + esc(t.kw) + "</h2>" +
+        t.faq.map(function (f) { return "<details><summary>" + esc(f[0]) + "</summary><p>" + f[1] + "</p></details>"; }).join("") + "</div>";
+    }
+    function faqLd(t) {
+      if (!t.faq || !t.faq.length) return null;
+      return { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: t.faq.map(function (f) {
+        return { "@type": "Question", name: f[0], acceptedAnswer: { "@type": "Answer", text: String(f[1]).replace(/<[^>]+>/g, "") } };
+      }) };
+    }
     function topicLinks(exceptSlug) {
       return '<div class="tlinks">' + topicsUsed.filter(function (x) { return x.t.slug !== exceptSlug; }).map(function (x) {
         return '<a href="/' + x.t.slug + '/">' + esc(x.t.h1) + " <small>(" + x.n + ")</small></a>";
@@ -202,16 +316,24 @@
         "<li><b>Theo sát phiên đấu giá</b>Cùng bạn theo dõi phiên trực tuyến, tư vấn chiến lược trả giá.</li>" +
         "<li><b>Hoàn tất thủ tục</b>Hướng dẫn nộp tiền trúng đấu giá và đăng ký biển cho xe.</li></ol>" +
         '<p>Liên hệ ngay <a href="tel:' + hotline(SITE) + '"><b>' + hotFmt(SITE) + "</b></a> (Zalo cùng số) để được tư vấn miễn phí.</p></div>" : "";
+      var shown = list.length ? list : featured;
+      var countTxt = list.length ? " Hiện có <b>" + list.length + " biển</b>." + esc(priceNote) : "";
       var body = cr.html + '<h1 class="seo-h1">' + esc(t.h1) + "</h1>" +
-        '<p class="seo-intro">' + esc(t.intro) + " Hiện có <b>" + list.length + " biển</b>." + esc(priceNote) + ' Gọi/Zalo <a href="tel:' + hotline(SITE) + '"><b>' + hotFmt(SITE) + "</b></a> để giữ biển.</p>" +
+        '<p class="seo-intro">' + esc(t.intro) + countTxt + ' Gọi/Zalo <a href="tel:' + hotline(SITE) + '"><b>' + hotFmt(SITE) + "</b></a> để " + (list.length ? "giữ biển" : "được tìm biển theo yêu cầu") + ".</p>" +
         service +
-        '<div class="gr">' + list.map(card).join("") + "</div>" +
+        (t.contentTop ? '<div class="panel seo-text">' + t.contentTop + "</div>" : "") +
+        (list.length ? "" : '<h2 class="seo-h2">' + esc(t.fallbackTitle || "Biển số đẹp Ninh Bình đang có sẵn") + "</h2>") +
+        '<div class="gr">' + shown.map(card).join("") + "</div>" +
+        (t.content ? '<div class="panel seo-text">' + t.content + "</div>" : "") +
+        faqHtml(t) +
         '<h2 class="seo-h2">Xem thêm</h2>' + topicLinks(t.slug);
-      var title = t.h1 + " – " + list.length + " biển có giá | Kho Biển Số Đẹp Mai Xuân Huy";
-      var desc = t.h1 + ": " + list.length + " biển" + priceNote + " " + t.intro.slice(0, 90) + "… Hotline/Zalo " + hotFmt(SITE) + ".";
-      var ldList = { "@context": "https://schema.org", "@type": "ItemList", name: t.h1, numberOfItems: list.length,
-        itemListElement: list.slice(0, 50).map(function (it, i) { return { "@type": "ListItem", position: i + 1, url: BASE + it.url, name: "Biển số " + it.label }; }) };
-      files[t.slug + "/index.html"] = layout({ SITE: SITE, path: path, title: title, desc: desc, body: body, ld: [cr.ld, ldList] });
+      var title = t.title || (t.h1 + " – " + list.length + " biển có giá | Kho Biển Số Đẹp Mai Xuân Huy");
+      var desc = t.desc || (t.h1 + ": " + list.length + " biển" + priceNote + " " + t.intro.slice(0, 90) + "… Hotline/Zalo " + hotFmt(SITE) + ".");
+      var ldList = { "@context": "https://schema.org", "@type": "ItemList", name: t.h1, numberOfItems: shown.length,
+        itemListElement: shown.slice(0, 50).map(function (it, i) { return { "@type": "ListItem", position: i + 1, url: BASE + it.url, name: "Biển số " + it.label }; }) };
+      var ldAll = [cr.ld, ldList];
+      if (faqLd(t)) ldAll.push(faqLd(t));
+      files[t.slug + "/index.html"] = layout({ SITE: SITE, path: path, title: title, desc: desc, body: body, ld: ldAll });
       urls.push({ loc: path, lastmod: today, pri: "0.8" });
     });
 
