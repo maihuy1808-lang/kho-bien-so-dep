@@ -328,6 +328,20 @@
     var s = document.createElement("script"); s.src = "https://www.tiktok.com/embed.js"; s.async = true; document.body.appendChild(s);
   }
   /* ---------- Biển đẹp hôm nay (daily.js) ---------- */
+  function shareBarHtml(p, it) {
+    var url = "https://maixuanhuy.id.vn/bien-dep-hom-nay/" + p.d + "/";
+    var hot = SITE.hotline ? SITE.hotline.replace(/\s/g, "").replace(/^(\d{4})(\d{3})(\d{3})$/, "$1.$2.$3") : "";
+    var txt = (p.mo ? p.mo + "\n\n" : "") + "🚗 " + p.bien + (p.ten ? " – " + p.ten : "") + "\n" + (p.noi ? p.noi + "\n" : "") +
+      (p.tho ? "\n" + p.tho.split(" / ").join("\n") + "\n" : "") +
+      (it && it.price && it.st !== "ban" ? "\n💰 Giá: " + money(it.price) + (it.sale ? " (giảm từ " + money(it.old) + ")" : "") : "") +
+      (it && it.st === "trung" ? "\n📌 Xe gắn biển trúng đấu giá, hỗ trợ chuyển nhượng đúng quy định" : "") +
+      "\n\n👉 Xem chi tiết: " + url + "\n📞 Hotline/Zalo Mr. Mai Xuân Huy " + hot + "\n\n#biensodep #biensoninhbinh #" + p.bien.slice(0, 3);
+    return '<div class="shr-bar" data-url="' + esc(url) + '" data-text="' + esc(txt) + '"><span class="shr-l">Chia sẻ bài này:</span>' +
+      '<button type="button" class="shr fb" data-act="fb">Chia sẻ Facebook</button>' +
+      '<button type="button" class="shr" data-act="native" hidden>Chia sẻ…</button>' +
+      '<button type="button" class="shr" data-act="copy">Sao chép nội dung</button>' +
+      '<button type="button" class="shr" data-act="link">Sao chép link</button></div>';
+  }
   function renderDaily() {
     var box = $("homnay"); if (!box || typeof DAILY === "undefined" || !DAILY.length) return;
     var t = new Date(), today = t.getFullYear() + "-" + String(t.getMonth() + 1).padStart(2, "0") + "-" + String(t.getDate()).padStart(2, "0");
@@ -346,8 +360,10 @@
       '<p class="hn-price">' + (it ? priceHtml(it) : "") + "</p>" +
       '<div class="hn-btn"><a class="btn" href="/bien-dep-hom-nay/' + p.d + '/">Xem bài</a>' +
       (it ? '<button type="button" class="btn ghost" onclick="openPlate(' + it.id + ')">Chi tiết biển</button>' : '<a class="btn ghost" href="/bien/' + slug + '/">Chi tiết biển</a>') +
-      '<a class="hn-more" href="/bien-dep-hom-nay/">Các ngày trước →</a></div></div></div>';
+      '<a class="hn-more" href="/bien-dep-hom-nay/">Các ngày trước →</a></div>' +
+      shareBarHtml(p, it) + "</div></div>";
     box.hidden = false;
+    if (window.initShareBars) window.initShareBars(box);
   }
 
   function videoOfPlate(it) {

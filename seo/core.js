@@ -10,7 +10,7 @@
 (function (root) {
   "use strict";
   var BASE = "https://maixuanhuy.id.vn";
-  var CSS_V = "seo-1128a";
+  var CSS_V = "seo-1128b";
 
   /* ---- Nhận diện loại biển (giống app.js) ---- */
   var HANH = ["Thổ", "Thủy", "Hỏa", "Mộc", "Kim", "Thổ", "Thủy", "Hỏa", "Mộc", "Kim"];
@@ -229,6 +229,15 @@
   }
 
   /* ---- Khung trang ---- */
+  // Thanh chia sẻ (hành động trong /share.js)
+  function shareBar(path, text) {
+    return '<div class="shr-bar" data-url="' + esc(BASE + path) + '" data-text="' + esc(text) + '">' +
+      '<span class="shr-l">Chia sẻ bài này:</span>' +
+      '<button type="button" class="shr fb" data-act="fb">Chia sẻ Facebook</button>' +
+      '<button type="button" class="shr" data-act="native" hidden>Chia sẻ…</button>' +
+      '<button type="button" class="shr" data-act="copy">Sao chép nội dung</button>' +
+      '<button type="button" class="shr" data-act="link">Sao chép link</button></div>';
+  }
   function layout(o) {
     var S = o.SITE, tel = hotline(S), zalo = String(S.zalo || "").replace(/\s/g, "");
     return '<!DOCTYPE html>\n<html lang="vi">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n' +
@@ -258,6 +267,7 @@
       '<p class="dis">Website thương mại tư nhân, cung cấp thông tin và kết nối nhu cầu liên quan đến biển số xe theo quy định pháp luật Việt Nam. Không phải cơ quan nhà nước, không đại diện Bộ Công an hay cơ quan đăng ký xe, không thực hiện cấp hoặc phát hành biển số. Thông tin phong thủy mang tính tham khảo. Tình trạng biển có thể thay đổi, vui lòng liên hệ để xác nhận.</p></div></footer>\n' +
       '<div class="fx"><a class="c1" href="tel:' + esc(tel) + '">📞 Gọi ngay</a><a class="c2" href="https://zalo.me/' + esc(zalo) + '" target="_blank" rel="noopener">Zalo</a><a class="c3" href="' + esc(S.messenger || "#") + '" target="_blank" rel="noopener">Messenger</a></div>\n' +
       (o.pagePlate ? "<script>window.__PAGE_PLATE=" + JSON.stringify(o.pagePlate).replace(/</g, "\\u003c") + ";</script>\n" : "") +
+      '<script src="/share.js?v=' + CSS_V + '"></script>\n' +
       '<script src="/analytics.js?v=' + CSS_V + '"></script>\n</body>\n</html>\n';
   }
   function plateHtml(it, big) {
@@ -433,6 +443,11 @@
         (it.date ? "<dt>Ngày đăng</dt><dd>" + fmtDate(it.date) + "</dd>" : "") + "</dl>" +
         '<div class="row cta"><a class="btn" href="tel:' + hotline(SITE) + '">📞 Gọi ngay</a><a class="btn" style="background:#0068ff" href="https://zalo.me/' + esc(String(SITE.zalo || "").replace(/\s/g, "")) + '" target="_blank" rel="noopener">Nhắn Zalo</a></div>' +
         "</div></div>" +
+        shareBar(path, "🚗 Biển số " + it.label + (m ? " – " + m.title : "") + "\n" + (m && m.sense ? m.sense + "\n" : "") +
+          (m && m.verse ? "\n" + m.verse.split(" / ").join("\n") + "\n" : "") +
+          (it.st !== "ban" && it.price ? "\n💰 Giá: " + money(it.price) + (it.old > it.price ? " (giảm từ " + money(it.old) + ")" : "") : "") +
+          (it.st === "trung" ? "\n📌 Xe gắn biển trúng đấu giá, hỗ trợ chuyển nhượng đúng quy định" : "") +
+          "\n\n👉 Xem chi tiết: " + BASE + path + "\n📞 Hotline/Zalo Mr. Mai Xuân Huy " + hotFmt(SITE)) +
         (m ? '<div class="ynghia"><b>Ý nghĩa biển số ' + esc(it.label) + '</b><p class="yt">' + esc(m.title) + "</p>" + (m.sense ? '<p class="ys">' + esc(m.sense) + "</p>" : "") +
           (m.verse ? '<p class="tho">' + esc(m.verse).split(" / ").join("<br>") + "</p>" : "") + "</div>" : "") +
         (vid ? '<div class="mvid"><iframe src="https://www.tiktok.com/player/v1/' + esc(vid.id) + '?music_info=0&description=1&rel=0" loading="lazy" title="Video biển ' + esc(it.label) + '" allow="fullscreen; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>' : "") +
@@ -478,6 +493,11 @@
         var ten = p.ten || (it && it.mean ? it.mean.title : "");
         var h1 = "Biển đẹp hôm nay " + fmtDate(p.d) + ": " + p.bien + (ten ? " – " + ten : "");
         var newer = DAILY[i - 1], older = DAILY[i + 1];
+        var shareTxt = (p.mo ? p.mo + "\n\n" : "") + "🚗 " + p.bien + (ten ? " – " + ten : "") + "\n" + (p.noi ? p.noi + "\n" : "") +
+          (p.tho ? "\n" + p.tho.split(" / ").join("\n") + "\n" : "") +
+          (it && it.price && it.st !== "ban" ? "\n💰 Giá: " + money(it.price) + (it.old > it.price ? " (giảm từ " + money(it.old) + ")" : "") : "") +
+          (it && it.st === "trung" ? "\n📌 Xe gắn biển trúng đấu giá, hỗ trợ chuyển nhượng đúng quy định" : "") +
+          "\n\n👉 Xem chi tiết: " + BASE + path + "\n📞 Hotline/Zalo Mr. Mai Xuân Huy " + hotFmt(SITE) + "\n\n#biensodep #biensoninhbinh #" + p.bien.slice(0, 3);
         var body = cr.html + '<h1 class="seo-h1">' + esc(h1) + "</h1>" +
           (p.mo ? '<p class="seo-intro">' + esc(p.mo) + "</p>" : "") +
           '<div class="seo-plate"><div class="seo-plate-l">' + (it ? plateHtml(it, true) : '<div class="pl big">' + esc(p.bien) + "</div>") + '</div><div class="seo-plate-r">' +
@@ -488,6 +508,7 @@
           (it && it.st === "ban" ? '<p class="dnote">Biển này đã có chủ. Xem các biển tương tự trong kho bên dưới.</p>' : "") +
           '<div class="row cta">' + (it ? '<a class="btn" style="background:var(--navy)" href="' + it.url + '">Xem chi tiết biển</a>' : "") +
           '<a class="btn" href="tel:' + hotline(SITE) + '">📞 Gọi ngay</a></div></div></div>' +
+          shareBar(path, shareTxt) +
           '<div class="dnav">' + (older ? '<a href="' + DAILY_ROOT + older.d + '/">← ' + fmtDate(older.d) + ": " + esc(older.bien) + "</a>" : "<span></span>") +
           (newer ? '<a href="' + DAILY_ROOT + newer.d + '/">' + fmtDate(newer.d) + ": " + esc(newer.bien) + " →</a>" : "") + "</div>" +
           '<h2 class="seo-h2">Các ngày khác</h2><div class="dgrid">' + DAILY.filter(function (x) { return x !== p; }).slice(0, 8).map(dailyCard).join("") + "</div>" +
