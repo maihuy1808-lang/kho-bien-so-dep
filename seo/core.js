@@ -465,6 +465,15 @@
         brand: { "@type": "Brand", name: "Kho Biển Số Đẹp Mai Xuân Huy" } };
       if (it.price > 0 && it.st !== "ban") product.offers = { "@type": "Offer", url: BASE + path, priceCurrency: "VND", price: it.price,
         availability: "https://schema.org/InStock", itemCondition: "https://schema.org/NewCondition",
+        // Giao nhận trực tiếp tại Ninh Bình (không gửi hàng, không thu phí vận chuyển); không áp dụng đổi trả.
+        shippingDetails: { "@type": "OfferShippingDetails",
+          shippingRate: { "@type": "MonetaryAmount", value: 0, currency: "VND" },
+          shippingDestination: { "@type": "DefinedRegion", addressCountry: "VN" },
+          deliveryTime: { "@type": "ShippingDeliveryTime",
+            handlingTime: { "@type": "QuantitativeValue", minValue: 0, maxValue: 7, unitCode: "DAY" },
+            transitTime: { "@type": "QuantitativeValue", minValue: 0, maxValue: 0, unitCode: "DAY" } } },
+        hasMerchantReturnPolicy: { "@type": "MerchantReturnPolicy", applicableCountry: "VN",
+          returnPolicyCategory: "https://schema.org/MerchantReturnNotPermitted" },
         seller: { "@type": "AutoDealer", "@id": BASE + "/#kho", name: "Kho Biển Số Đẹp Ninh Bình – Mr. Mai Xuân Huy" } };
       ld.push(product);
       var title = "Biển số " + it.label + (it.tags[0] ? " " + it.tags[0].toLowerCase() : "") + " – " + (it.st === "ban" ? "Đã bán" : it.price ? money(it.price) : "Giá liên hệ") + " | Biển số đẹp " + (it.pre.indexOf("35") === 0 ? "Ninh Bình" : "") ;
