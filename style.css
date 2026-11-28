@@ -257,3 +257,25 @@ a.pc{color:inherit;text-decoration:none}
 .htt th,.htt td{border:1px solid var(--line);padding:7px 10px;text-align:left}
 .htt th{background:var(--bg);font-weight:700}
 .htt tbody tr:nth-child(even){background:var(--bg)}
+
+/* Biển đẹp hôm nay */
+.homnay{margin:0 0 24px;background:linear-gradient(120deg,var(--card),var(--bg));border:1px solid var(--gold);border-radius:var(--r);box-shadow:var(--sh)}
+.hn-in{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:22px;align-items:center;padding:20px}
+.hn-l{display:grid;place-items:center}
+.hn-tag{display:inline-block;background:var(--red);color:#fff;font-weight:800;font-size:13px;border-radius:99px;padding:3px 12px}
+.hn-mo{font-weight:700;margin:10px 0 2px}
+.hn-r h2{margin:4px 0 6px;font-size:22px}
+.hn-r p{margin:4px 0}
+.hn-price{font-size:20px;font-weight:800;color:var(--red)}
+.hn-btn{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px}
+.hn-more{font-weight:700;color:var(--red)}
+@media(max-width:700px){.hn-in{grid-template-columns:1fr;padding:16px}}
+.dgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.dcard{display:flex;flex-direction:column;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;color:inherit;box-shadow:var(--sh)}
+.dcard:hover{border-color:var(--gold)}
+.dcard .dd{font-size:12.5px;font-weight:800;color:var(--red)}
+.dcard .dt{font-size:14px}
+.dnoi{line-height:1.7}
+.dnote{background:var(--bg);border-left:4px solid var(--gold);padding:8px 12px;border-radius:8px}
+.dnav{display:flex;justify-content:space-between;gap:10px;margin:16px 0;flex-wrap:wrap}.dnav a{font-weight:700;color:var(--red)}
+.hn-l .pl.big{font-size:clamp(22px,3.2vw,34px);padding:12px 10px;max-width:100%}.hn-l .glow{max-width:100%}.hn-l{min-width:0}

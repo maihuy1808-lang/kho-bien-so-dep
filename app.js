@@ -327,6 +327,29 @@
     box.innerHTML = '<blockquote class="tiktok-embed" cite="https://www.tiktok.com/@' + TT_USER + '" data-unique-id="' + TT_USER + '" data-embed-type="creator" style="max-width:780px;min-width:288px;margin:0 auto"><section><a target="_blank" rel="noopener" href="https://www.tiktok.com/@' + TT_USER + '">@' + TT_USER + "</a></section></blockquote>";
     var s = document.createElement("script"); s.src = "https://www.tiktok.com/embed.js"; s.async = true; document.body.appendChild(s);
   }
+  /* ---------- Biển đẹp hôm nay (daily.js) ---------- */
+  function renderDaily() {
+    var box = $("homnay"); if (!box || typeof DAILY === "undefined" || !DAILY.length) return;
+    var t = new Date(), today = t.getFullYear() + "-" + String(t.getMonth() + 1).padStart(2, "0") + "-" + String(t.getDate()).padStart(2, "0");
+    var list = DAILY.filter(function (p) { return p.d <= today; }).sort(function (a, b) { return a.d < b.d ? 1 : -1; });
+    var p = list[0]; if (!p) return;
+    var it = ITEMS.filter(function (x) { return plateKey(x.pre + x.tail) === plateKey(p.bien); })[0];
+    var slug = p.bien.toLowerCase().replace(/[^0-9a-z]+/g, "-");
+    var isToday = p.d === today;
+    box.innerHTML = '<div class="hn-in">' +
+      '<div class="hn-l">' + (it ? plateHtml(it, true) : '<div class="pl big">' + esc(p.bien) + "</div>") + "</div>" +
+      '<div class="hn-r"><span class="hn-tag">📅 ' + (isToday ? "Biển đẹp hôm nay" : "Biển đẹp gần nhất") + " · " + fmtDate(p.d) + "</span>" +
+      (p.mo ? '<p class="hn-mo">' + esc(p.mo) + "</p>" : "") +
+      "<h2>" + esc(p.bien) + (p.ten ? " – " + esc(p.ten) : "") + "</h2>" +
+      (p.noi ? "<p>" + esc(p.noi) + "</p>" : "") +
+      (p.tho ? '<p class="tho">' + esc(p.tho).split(" / ").join("<br>") + "</p>" : "") +
+      '<p class="hn-price">' + (it ? priceHtml(it) : "") + "</p>" +
+      '<div class="hn-btn"><a class="btn" href="/bien-dep-hom-nay/' + p.d + '/">Xem bài</a>' +
+      (it ? '<button type="button" class="btn ghost" onclick="openPlate(' + it.id + ')">Chi tiết biển</button>' : '<a class="btn ghost" href="/bien/' + slug + '/">Chi tiết biển</a>') +
+      '<a class="hn-more" href="/bien-dep-hom-nay/">Các ngày trước →</a></div></div></div>';
+    box.hidden = false;
+  }
+
   function videoOfPlate(it) {
     var k = plateKey(it.pre + it.tail);
     return VIDS.filter(function (v) { return v.b && plateKey(v.b) === k; })[0];
@@ -381,6 +404,7 @@
     document.addEventListener("click", function () { closeDD(); });
     document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeDD(); });
     renderVideos();
+    renderDaily();
     var bt = $("bangtin");
     if (bt && "IntersectionObserver" in window) {
       new IntersectionObserver(function (en, ob) { if (en[0].isIntersecting) { loadCreator(); ob.disconnect(); } }, { rootMargin: "400px" }).observe(bt);

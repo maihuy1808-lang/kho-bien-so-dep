@@ -10,7 +10,7 @@
 (function (root) {
   "use strict";
   var BASE = "https://maixuanhuy.id.vn";
-  var CSS_V = "seo6";
+  var CSS_V = "seo-1128a";
 
   /* ---- Nhận diện loại biển (giống app.js) ---- */
   var HANH = ["Thổ", "Thủy", "Hỏa", "Mộc", "Kim", "Thổ", "Thủy", "Hỏa", "Mộc", "Kim"];
@@ -458,9 +458,64 @@
       urls.push({ loc: path, lastmod: it.date && it.date <= today ? it.date : today, pri: it.st === "ban" ? "0.3" : "0.6" });
     });
 
+    // Biển đẹp hôm nay: trang lưu trữ + mỗi ngày 1 trang (daily.js)
+    var DAILY = (ctx.DAILY || []).filter(function (p) { return /^\d{4}-\d{2}-\d{2}$/.test(p.d) && p.bien && p.d <= today; })
+      .sort(function (a, b) { return a.d < b.d ? 1 : -1; });
+    var bySlugKey = {}; items.forEach(function (it) { bySlugKey[key(it.label)] = it; });
+    var DAILY_ROOT = "/bien-dep-hom-nay/";
+    function dailyPlate(p) { return bySlugKey[key(p.bien)] || null; }
+    function dailyCard(p) {
+      var it = dailyPlate(p);
+      return '<a class="dcard" href="' + DAILY_ROOT + p.d + '/"><span class="dd">' + fmtDate(p.d) + "</span>" +
+        (it ? plateHtml(it) : '<div class="pl">' + esc(p.bien) + "</div>") +
+        '<b class="dt">' + esc(p.ten || (it && it.mean ? it.mean.title : "")) + "</b>" +
+        '<span class="pr">' + (it ? priceHtml(it) : "") + "</span></a>";
+    }
+    if (DAILY.length) {
+      DAILY.forEach(function (p, i) {
+        var it = dailyPlate(p), path = DAILY_ROOT + p.d + "/";
+        var cr = crumbs([["Trang chủ", "/"], ["Biển đẹp hôm nay", DAILY_ROOT], [fmtDate(p.d), path]]);
+        var ten = p.ten || (it && it.mean ? it.mean.title : "");
+        var h1 = "Biển đẹp hôm nay " + fmtDate(p.d) + ": " + p.bien + (ten ? " – " + ten : "");
+        var newer = DAILY[i - 1], older = DAILY[i + 1];
+        var body = cr.html + '<h1 class="seo-h1">' + esc(h1) + "</h1>" +
+          (p.mo ? '<p class="seo-intro">' + esc(p.mo) + "</p>" : "") +
+          '<div class="seo-plate"><div class="seo-plate-l">' + (it ? plateHtml(it, true) : '<div class="pl big">' + esc(p.bien) + "</div>") + '</div><div class="seo-plate-r">' +
+          '<p class="seo-price">' + (it ? priceHtml(it) + (it.old > it.price && it.price && it.st !== "ban" ? ' <span class="off">-' + Math.round((1 - it.price / it.old) * 100) + "%</span>" : "") : "Liên hệ") + "</p>" +
+          (p.noi ? '<p class="dnoi">' + esc(p.noi) + "</p>" : "") +
+          (p.tho ? '<p class="tho">' + esc(p.tho).split(" / ").join("<br>") + "</p>" : "") +
+          (it && it.st === "trung" ? '<p class="dnote">📌 Xe gắn biển trúng đấu giá, hỗ trợ chuyển nhượng đúng quy định.</p>' : "") +
+          (it && it.st === "ban" ? '<p class="dnote">Biển này đã có chủ. Xem các biển tương tự trong kho bên dưới.</p>' : "") +
+          '<div class="row cta">' + (it ? '<a class="btn" style="background:var(--navy)" href="' + it.url + '">Xem chi tiết biển</a>' : "") +
+          '<a class="btn" href="tel:' + hotline(SITE) + '">📞 Gọi ngay</a></div></div></div>' +
+          '<div class="dnav">' + (older ? '<a href="' + DAILY_ROOT + older.d + '/">← ' + fmtDate(older.d) + ": " + esc(older.bien) + "</a>" : "<span></span>") +
+          (newer ? '<a href="' + DAILY_ROOT + newer.d + '/">' + fmtDate(newer.d) + ": " + esc(newer.bien) + " →</a>" : "") + "</div>" +
+          '<h2 class="seo-h2">Các ngày khác</h2><div class="dgrid">' + DAILY.filter(function (x) { return x !== p; }).slice(0, 8).map(dailyCard).join("") + "</div>" +
+          '<p style="margin-top:12px"><a href="' + DAILY_ROOT + '"><b>Xem tất cả bài "Biển đẹp hôm nay" →</b></a></p>' +
+          '<h2 class="seo-h2">Danh mục biển số</h2>' + topicLinks("");
+        var desc = (p.mo ? p.mo + " " : "") + p.bien + (ten ? " – " + ten : "") + (it && it.price && it.st !== "ban" ? ", giá " + money(it.price) : "") + ". " + (p.noi || "").slice(0, 90) + " Hotline/Zalo " + hotFmt(SITE) + ".";
+        var art = { "@context": "https://schema.org", "@type": "BlogPosting", headline: h1, datePublished: p.d, dateModified: p.d,
+          author: { "@type": "Person", name: "Mai Xuân Huy" }, publisher: { "@type": "Organization", name: "Kho Biển Số Đẹp Mai Xuân Huy" },
+          mainEntityOfPage: BASE + path, image: BASE + "/og-mr-xuan-huy-2.jpg" };
+        var ogImg = it ? (images.filter(function (im) { return im.path.indexOf("og/" + it.slug + "-") === 0; })[0] || {}).path : null;
+        files[path.slice(1) + "index.html"] = layout({ SITE: SITE, path: path, title: h1 + " | Biển số đẹp Ninh Bình", desc: desc, body: body, ld: [cr.ld, art], ogType: "article", ogImage: ogImg ? "/" + ogImg : undefined,
+          pagePlate: it ? { bien: it.label, loai: it.tags[0] || "Biển thường", xe: it.v === "xemay" ? "Xe máy" : "Ô tô", gia: it.st === "ban" ? 0 : it.price, st: ST[it.st] || it.st } : undefined });
+        urls.push({ loc: path, lastmod: p.d, pri: "0.5" });
+      });
+      var crA = crumbs([["Trang chủ", "/"], ["Biển đẹp hôm nay", DAILY_ROOT]]);
+      files["bien-dep-hom-nay/index.html"] = layout({ SITE: SITE, path: DAILY_ROOT,
+        title: "Biển đẹp hôm nay – mỗi ngày một biển số đẹp Ninh Bình | Mr. Mai Xuân Huy",
+        desc: "Mỗi ngày giới thiệu một biển số đẹp Ninh Bình kèm ý nghĩa và giá. Hôm nay: " + DAILY[0].bien + ". Hotline/Zalo " + hotFmt(SITE) + ".",
+        body: crA.html + '<h1 class="seo-h1">Biển đẹp hôm nay</h1><p class="seo-intro">Mỗi ngày Mr. Mai Xuân Huy chọn một biển số đẹp Ninh Bình trong kho, kèm cách đọc, ý nghĩa và giá hiện tại. Có ' + DAILY.length + " bài.</p>" +
+          '<div class="dgrid">' + DAILY.map(dailyCard).join("") + "</div>" + '<h2 class="seo-h2">Danh mục biển số</h2>' + topicLinks(""),
+        ld: [crA.ld] });
+      urls.push({ loc: DAILY_ROOT, lastmod: DAILY[0].d, pri: "0.7" });
+    }
+
     // Danh mục chèn vào trang chủ
     var sale = items.filter(forSale).sort(sortByPrice);
-    var danhMuc = '<section class="panel seo-dm" id="danhmuc"><h2>Danh mục biển số đẹp Ninh Bình</h2>' + topicLinks("") +
+    var danhMuc = '<section class="panel seo-dm" id="danhmuc"><h2>Danh mục biển số đẹp Ninh Bình</h2>' +
+      (DAILY.length ? '<p style="margin:0 0 10px"><a href="' + DAILY_ROOT + '"><b>📅 Biển đẹp hôm nay</b> – ' + DAILY.length + " bài, mới nhất " + fmtDate(DAILY[0].d) + "</a></p>" : "") + topicLinks("") +
       '<details><summary>Xem danh sách tất cả ' + sale.length + " biển đang bán</summary><p class=\"seo-all\">" +
       sale.map(function (it) { return '<a href="' + it.url + '">' + esc(it.label) + "</a>"; }).join(" · ") + "</p></details></section>";
 
@@ -469,7 +524,7 @@
       urls.map(function (u) { return "  <url><loc>" + BASE + u.loc + "</loc><lastmod>" + u.lastmod + "</lastmod><priority>" + u.pri + "</priority></url>"; }).join("\n") + "\n</urlset>\n";
     files["robots.txt"] = "User-agent: *\nAllow: /\nDisallow: /admin/\n\nSitemap: " + BASE + "/sitemap.xml\n";
 
-    return { files: files, images: images, danhMuc: danhMuc, topicDirs: TOPICS.map(function (t) { return t.slug; }), count: { plates: items.length, topics: topicsUsed.length, urls: urls.length } };
+    return { files: files, images: images, danhMuc: danhMuc, topicDirs: TOPICS.map(function (t) { return t.slug; }).concat(["bien-dep-hom-nay"]), count: { plates: items.length, topics: topicsUsed.length, urls: urls.length } };
   }
 
   root.SEOCore = { build: build, TOPICS: TOPICS };

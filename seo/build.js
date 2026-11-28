@@ -9,13 +9,13 @@ const ROOT = path.join(__dirname, "..");
 const ctx = { console, Date, Math, JSON, String, Number };
 ctx.window = ctx;
 vm.createContext(ctx);
-for (const f of ["data.js", "videos.js", "meaning.js", "seo/core.js"]) {
+for (const f of ["data.js", "videos.js", "daily.js", "meaning.js", "seo/core.js"]) {
   const p = path.join(ROOT, f);
   if (fs.existsSync(p)) vm.runInContext(fs.readFileSync(p, "utf8"), ctx, { filename: f });
 }
 if (!ctx.SEOCore || !ctx.PLATES || !ctx.SITE) { console.error("Thiếu dữ liệu (SEOCore/PLATES/SITE)"); process.exit(1); }
 
-const out = ctx.SEOCore.build({ SITE: ctx.SITE, PLATES: ctx.PLATES, VIDEOS: ctx.VIDEOS || [], PlateMeaning: ctx.PlateMeaning, now: new Date() });
+const out = ctx.SEOCore.build({ SITE: ctx.SITE, PLATES: ctx.PLATES, VIDEOS: ctx.VIDEOS || [], DAILY: ctx.DAILY || [], PlateMeaning: ctx.PlateMeaning, now: new Date() });
 
 // Ảnh chia sẻ riêng từng biển: SVG → PNG bằng rsvg-convert (cài trong GitHub Actions).
 // Tên ảnh có mã băm nội dung → giá đổi thì tên đổi, Facebook không dùng ảnh cũ.
